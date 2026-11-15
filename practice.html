@@ -207,6 +207,7 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 
 .panel { padding-block: 18px 22px; border-top: 2px solid var(--foreground); }
 .eyebrow { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 8px; }
+.eyebrow.who { font: 700 20px/1.3 var(--body); letter-spacing: .01em; text-transform: uppercase; color: var(--bad); margin: 0 0 10px; }
 .q { display: block; font: 800 20px/1.25 var(--body); letter-spacing: -.02em; margin: 0 0 12px; text-wrap: balance; }
 .combo { position: relative; }
 #guess { width: 100%; font: 500 18px var(--body); padding: 11px 14px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); }
@@ -695,7 +696,7 @@ const inp = $('#guess'), list = $('#sugg'), msg = $('#msg');
 const HINT = 'Πιο κοντά = περισσότεροι βαθμοί, έως 1.000 ανά γύρο.';
 function renderAll() {
   $('#archtag').hidden = !S.arch && !S.shared;
-  $('#archtag').textContent = S.shared ? 'Προβολή' : 'Αρχείο';
+  $('#archtag').textContent = S.shared ? 'Σκορ άλλου παίκτη' : 'Αρχείο';
   const you = !S.shared;  // the player's own game, or someone else's shared results
   $('#date').textContent = PRACTICE ? 'Practice · 5 τυχαία μέρη' : `#${dayNum(S.day)} · ${longFmt.format(keyDate(S.day))}`;
   const sk = shown();
@@ -743,7 +744,8 @@ function renderAll() {
     const hAvg = histD.length ? histD.reduce((a, b) => a + b, 0) / histD.length : null;
     $('#davg').innerHTML = `${fmtKm(avgD)}<span class="sub">${hAvg == null ? 'ανά γύρο' : `ο μέσος όρος σου: ${fmtKm(hAvg)}`}</span>`;
     const prev = S.prevBest || 0;
-    $('#dlbl').textContent = S.shared ? `Αποτελέσματα: ${S.shared} · #${dayNum(S.day)}`
+    $('#dlbl').classList.toggle('who', !!S.shared);  // someone else's results: bigger, in red
+    $('#dlbl').textContent = S.shared ? `Αποτελέσματα του/της: ${S.shared} · #${dayNum(S.day)}`  /* name and number never part */
       : PRACTICE || S.day === todayKey() ? 'Το σημερινό σου αποτέλεσμα' : `Το αποτέλεσμά σου · #${dayNum(S.day)}`;
     $('#dbest').textContent = PRACTICE ? '' : S.shared ? (S.arch ? 'Παίχτηκε από το αρχείο.' : '') : S.arch ? 'Παίχτηκε από το αρχείο: δεν μετράει στα στατιστικά.' : prev > 0 && sum > prev
       ? `Νέο ρεκόρ! Το προηγούμενο ήταν ${nf.format(prev)}.`
