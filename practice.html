@@ -182,7 +182,8 @@ a:hover { text-decoration-style: solid; }
 /* ---------- side column ---------- */
 .top { padding-block: 22px 18px; }
 .brand h1 { font: 800 32px/1.05 var(--body); letter-spacing: -.025em; margin: 0; }
-.brand h1 { white-space: nowrap; }
+/* the tag (Αρχείο / Προβολή) stays beside the name when it fits, else goes under it, whole */
+.brand h1 .practag, .brand h1 .hname { white-space: nowrap; }
 .brand h1 .practag { font-size: 10px; padding: 2px 6px; }
 .dateline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-top: 8px; }
 .dateline .linkbtn { margin: 0; }
@@ -350,7 +351,7 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
   <div class="side">
     <header class="top pad">
       <div class="brand">
-        <h1>gamwtonkreza2 <span class="practag" id="archtag" hidden>Αρχείο</span></h1>
+        <h1><span class="hname">gamwtonkreza2</span> <span class="practag" id="archtag" hidden>Αρχείο</span></h1>
         <div class="dateline"><p class="date" id="date"></p><span class="dlinks"><button type="button" class="linkbtn" id="statsBtn">Στατιστικά</button><button type="button" class="linkbtn" id="archBtn">Αρχείο</button></span></div>
       </div>
       <p class="tag">Βρες την πόλη ή το χωριό που απεικονίζεται στο χάρτη, όσο πιο κοντά γίνεται κάθε φορά.</p>
@@ -1110,8 +1111,8 @@ function measure() {
   PW = r.width; PH = r.height;
   insetL = r.left <= 1 ? parseFloat(getComputedStyle($('#probe')).paddingLeft) || 0 : 0;
   // keep dots out from under the counter boxes when they sit over the map
-  const a = $('#bands').getBoundingClientRect();
-  const overlaps = Math.min(a.right, r.right) > Math.max(a.left, r.left) && Math.min(a.bottom, r.bottom) > Math.max(a.top, r.top);
+  const a = $('#bands')?.getBoundingClientRect();  // (Pinpoint Greece has none)
+  const overlaps = !!a && Math.min(a.right, r.right) > Math.max(a.left, r.left) && Math.min(a.bottom, r.bottom) > Math.max(a.top, r.top);
   padB = overlaps ? Math.max(0, r.bottom - a.top + 8) : 0;
 }
 function fit(box, pad) {
