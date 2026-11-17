@@ -378,12 +378,6 @@ ol.rank li .t { font-family: var(--mono); }
 ol.rank li[data-pid] { cursor: pointer; }
 ol.rank li[data-pid]:hover, ol.rank li[data-pid]:focus-visible { border-color: var(--foreground); background: var(--accent-neon); outline: none; }
 ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: var(--muted-foreground); }
-#lbDetail { display: grid; gap: 10px; }
-#lbDetail h3, #lbDetail p { margin: 0; }
-ol.gl { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-ol.gl li { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1.5px solid var(--border); background: var(--card); font-size: var(--fs-3); }
-ol.gl li .gt small { display: block; color: var(--muted-foreground); font-size: var(--fs-2); }
-ol.gl li .gms { font: 500 var(--fs-2) var(--mono); color: var(--muted-foreground); }
 </style>
 </head>
 <body>
@@ -519,12 +513,6 @@ ol.gl li .gms { font: 500 var(--fs-2) var(--mono); color: var(--muted-foreground
       <p class="hint" id="lbMsg"></p>
     </div>
     <div class="tabs"><button type="button" id="lbTabDay" aria-pressed="true">Σήμερα</button><button type="button" id="lbTabAll" aria-pressed="false">Όλων των εποχών</button></div>
-    <div id="lbDetail" hidden>
-      <button type="button" class="linkbtn" id="lbBack">← Πίσω στην κατάταξη</button>
-      <h3 class="endtitle" id="lbDName"></h3>
-      <p class="endrank" id="lbDMeta"></p>
-      <ol class="gl" id="lbDRounds"></ol>
-    </div>
     <ol class="rank" id="lbList"><li><span></span><span>Φόρτωση…</span><span></span></li></ol>
     <p class="note" id="lbNote"></p>
   </div>
@@ -1199,7 +1187,9 @@ function fit(box, pad) {
   return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 + (padB / 2) * s, s };
 }
 function clampV() {
-  const sMax = fit(GR_BOX, 0).s * 1.6;
+  // zoomed out no further than "all of Greece fits" (or the drawn map's own size, if that is bigger):
+  // past that the map would shrink inside the screen and show empty margins
+  const sMax = Math.max(Math.min(MW / Math.max(PW, 1), MH / Math.max(PH, 1)), fit(GR_BOX, 18).s);
   V.s = Math.min(sMax, Math.max(0.015, V.s));  // closest: 15 m per pixel, enough to part the names of crowded suburbs
   V.cx = Math.min(MW, Math.max(0, V.cx));
   V.cy = Math.min(MH, Math.max(0, V.cy));
@@ -1208,6 +1198,55 @@ const vx = () => V.cx - PW * V.s / 2, vy = () => V.cy - PH * V.s / 2;
 const toScreen = (x, y) => [(x - vx()) / V.s, (y - vy()) / V.s];
 const toMap = (px, py) => [vx() + px * V.s, vy() + py * V.s];
 
+
+/* ---------- detailed coast, cut to the view ---------- */
+let GDR = null;  // the detailed coast parsed once: rings of points, with a bounding box for every run of CH points
+const CH = 24;
+function parseGd() {
+  GDR = D.gd.split('M').filter(Boolean).map(r => {
+    const closed = r.endsWith('Z');
+    const nums = r.replace('Z', '').split('L').map(q => q.split(',').map(Number));
+    const n = nums.length, xs = new Float64Array(n), ys = new Float64Array(n);
+    nums.forEach((q, i) => { xs[i] = q[0]; ys[i] = q[1]; });
+    const nc = Math.ceil(n / CH), bb = new Float64Array(nc * 4);
+    let rx0 = Infinity, ry0 = Infinity, rx1 = -Infinity, ry1 = -Infinity;
+    for (let c = 0; c < nc; c++) {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (let i = c * CH; i < Math.min(n, c * CH + CH + 1); i++) {  // +1: a run includes the first point of the next one
+        if (xs[i] < x0) x0 = xs[i]; if (xs[i] > x1) x1 = xs[i]; if (ys[i] < y0) y0 = ys[i]; if (ys[i] > y1) y1 = ys[i];
+      }
+      bb.set([x0, y0, x1, y1], c * 4);
+      if (x0 < rx0) rx0 = x0; if (x1 > rx1) rx1 = x1; if (y0 < ry0) ry0 = y0; if (y1 > ry1) ry1 = y1;
+    }
+    return { n, xs, ys, closed, bb, box: [rx0, ry0, rx1, ry1] };
+  });
+}
+function cullGd() {
+  if (!GDR) parseGd();
+  const m = 24 * V.s, X0 = vx() - m, Y0 = vy() - m, X1 = vx() + PW * V.s + m, Y1 = vy() + PH * V.s + m;
+  const minD2 = (0.4 * V.s) ** 2;  // points closer than 0.4 screen pixels to the last kept one add nothing
+  const out = [];
+  for (const r of GDR) {
+    const [a, b, c, d] = r.box;
+    if (c < X0 || a > X1 || d < Y0 || b > Y1) continue;  // an island wholly out of view
+    const pts = [];
+    let lx = 0, ly = 0;
+    const push = (i, force) => {
+      const x = r.xs[i], y = r.ys[i];
+      if (force || !pts.length || (x - lx) ** 2 + (y - ly) ** 2 >= minD2) { pts.push(x.toFixed(2) + ',' + y.toFixed(2)); lx = x; ly = y; }
+    };
+    const nc = r.bb.length / 4;
+    for (let k = 0; k < nc; k++) {
+      const i0 = k * CH, i1 = Math.min(r.n - 1, i0 + CH);
+      const o = k * 4, away = r.bb[o + 2] < X0 || r.bb[o] > X1 || r.bb[o + 3] < Y0 || r.bb[o + 1] > Y1;
+      if (away) { push(i0, true); push(i1, true); }  // out of view: the chord between its ends stays out of view too
+      else for (let i = i0; i < i1; i++) push(i, false);
+    }
+    push(r.n - 1, true);
+    if (pts.length > 2) out.push('M' + pts.join('L') + (r.closed ? 'Z' : ''));
+  }
+  return out.join('');
+}
 let raf = 0, landDetail = false;
 function draw() {
   raf = 0;
@@ -1216,7 +1255,10 @@ function draw() {
   // the detailed coast (Thermaic Gulf, from OpenStreetMap) only once zoomed in 2.5x or more:
   // it has ~2.5x the points, and zoomed out its detail is far below a pixel
   const detail = !!D.gd && V.s < fit(GR_BOX, 0).s / 2.5;
-  if (detail !== landDetail) { landDetail = detail; $('#gr').setAttribute('d', detail ? D.gd : D.g); }
+  // zoomed in, the detailed coast has ~24,000 points and the browser would re-stroke all of them every frame:
+  // draw only the part in view, thinned to sub-pixel detail (rebuilt on every frame, so it is always sharp)
+  if (detail) { landDetail = true; $('#gr').setAttribute('d', cullGd()); }
+  else if (landDetail) { landDetail = false; $('#gr').setAttribute('d', D.g); }
   drawScale(); placeMarks(); placeExtras(); placeCard();
 }
 const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
@@ -1737,9 +1779,9 @@ async function submitScoreRaw() {
 }
 async function submitScore() { await submitScoreRaw(); renderEndLb(); }
 // the big leaderboard under the final score (daily game only)
-async function renderEndLb() {
+async function renderEndLb(noScroll) {
   const box = $('#endlb');
-  const show = !PRACTICE && S && S.phase === 'done' && !S.shared && !S.arch;
+  const show = !PRACTICE && S && S.phase === 'done' && !S.arch;
   box.hidden = !show;
   if (!show) return;
   try { lbData = await rpc('get_leaderboard', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_day: todayKey() }); }
@@ -1749,35 +1791,37 @@ async function renderEndLb() {
   $('#endList').innerHTML = lbData.day.length
     ? lbData.day.map((r, i) => rankRow(r, i, todayKey())).join('')
     : '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>';
-  if (!$('#done').hidden) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (!noScroll && !$('#done').hidden && !S.shared) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 let lbTab = 'day', lbData = null;
 const fmtDur = ms => { const t = Math.round(ms / 1000); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
 const rankRow = (r, i, day) => `<li${r.me ? ' class="me"' : ''}${r.pid ? ` data-pid="${r.pid}" data-day="${day}" tabindex="0" role="button" title="Δες τις επιλογές"` : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}${r.duration_ms ? `<span class="dur">${fmtDur(r.duration_ms)}</span>` : ''}</span><span class="t">${nf.format(r.total)}</span></li>`;
-const lbDetailMode = on => { for (const sel of ['#lbOptin', '#lb .tabs', '#lbList', '#lbNote']) $(sel).hidden = on; $('#lbDetail').hidden = !on; };
-async function openGame(pid, day) {
-  const d = $('#lb');
-  if (!d.open) { if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', ''); }
-  lbDetailMode(true);
-  $('#lbDName').textContent = ''; $('#lbDMeta').textContent = 'Φόρτωση…'; $('#lbDRounds').innerHTML = '';
+async function viewPlayer(pid, day, fromDialog) {
+  const say = t => { if (fromDialog) $('#lbNote').textContent = t; else setNotice(t); };
   let g;
   try { g = await rpc('get_game', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_player: pid, p_day: day || null }); }
-  catch (e) { $('#lbDMeta').textContent = 'Δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.'; return; }
-  if (!g.found) { $('#lbDMeta').textContent = 'Δεν βρέθηκε παιχνίδι.'; return; }
-  if (g.locked) { $('#lbDName').textContent = '🔒'; $('#lbDMeta').textContent = 'Τελείωσε πρώτα το σημερινό παιχνίδι για να δεις τις επιλογές των άλλων.'; return; }
-  $('#lbDName').textContent = g.name;
-  $('#lbDMeta').textContent = `#${dayNum(g.day)} · ${nf.format(g.total)} βαθμοί` + (g.duration_ms ? ` · ${fmtDur(g.duration_ms)} συνολικά` : '');
-  $('#lbDRounds').innerHTML = (g.rounds || []).map(r => {
-    const gp = BYQ.get(r.q), tp = r.t ? BYQ.get(r.t) : null;
-    const typed = r.typed && gp && r.typed.toLowerCase() !== gp.name.toLowerCase() ? ` · έγραψε «${esc(r.typed)}»` : '';
-    return `<li><span class="pip ${tone(r.pts)}">${r.pts}</span><span class="gt"><b>${esc(tp ? tp.name : '?')}</b><small>Απάντησε ${esc(gp ? gp.name : '?')} · ${fmtKm(r.d)}${typed}</small></span><span class="gms">${r.ms != null ? (r.ms / 1000).toFixed(1) + '″' : ''}</span></li>`;
-  }).join('');
+  catch (e) { return say('Δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.'); }
+  if (!g.found) return say('Δεν βρέθηκε παιχνίδι.');
+  if (g.locked) return say('🔒 Τελείωσε πρώτα το σημερινό παιχνίδι για να δεις τις επιλογές των άλλων.');
+  const rounds = g.rounds || [];
+  const targets = rounds.map((r, k) => (r.t && BYQ.has(r.t) ? r.t : dailyTargets(g.day)[k]));
+  if (rounds.length !== 5 || !targets.every(q => BYQ.has(q)) || !rounds.every(r => BYQ.has(r.q))) return say('Αυτό το παιχνίδι δεν μπορεί να εμφανιστεί.');
+  // same read-only view a shared link opens: never saved, never counted
+  S = { v: SAVE_V, day: g.day, targets, guesses: rounds.map(r => ({ q: r.q, d: r.d, pts: r.pts })), round: 4, phase: 'done', arch: g.day !== todayKey(), shared: g.name };
+  view = null; clearInput(); setNotice('');
+  if (fromDialog) closeDlg($('#lb'));
+  renderAll(); focusView(true); renderEndLb(true);
+  $('#panel').scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 for (const el of [$('#lbList'), $('#endList')]) {
-  el.addEventListener('click', e => { const li = e.target.closest('li[data-pid]'); if (li) openGame(li.dataset.pid, li.dataset.day); });
-  el.addEventListener('keydown', e => { const li = e.target.closest('li[data-pid]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openGame(li.dataset.pid, li.dataset.day); } });
+  const open = li => {
+    if (!li) return;
+    if (li.classList.contains('me')) { if (el.id === 'lbList') closeDlg($('#lb')); openDay(todayKey()); return; }
+    viewPlayer(li.dataset.pid, li.dataset.day || null, el.id === 'lbList');
+  };
+  el.addEventListener('click', e => open(e.target.closest('li[data-pid]')));
+  el.addEventListener('keydown', e => { const li = e.target.closest('li[data-pid]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(li); } });
 }
-$('#lbBack').addEventListener('click', () => { lbDetailMode(false); if (!lbData) lbLoad(); });
 
 function lbRender() {
   $('#lbTabDay').setAttribute('aria-pressed', lbTab === 'day'); $('#lbTabAll').setAttribute('aria-pressed', lbTab === 'alltime');
@@ -1799,7 +1843,6 @@ function lbOptinRender() {
   $('#lbDelRow').hidden = !on;
 }
 function openLb() {
-  lbDetailMode(false);
   lbOptinRender(); $('#lbMsg').textContent = ''; lbData = null; lbRender(); lbLoad();
   const d = $('#lb');
   if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
@@ -1857,6 +1900,7 @@ function start(data) {
   else route(false);
   submitScore();
   whoGate();
+  (window.requestIdleCallback || setTimeout)(() => { if (D.gd && !GDR) parseGd(); });  // ready before the first zoom
 }
 window.claude?.hot?.snapshot?.(() => ({ S }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
