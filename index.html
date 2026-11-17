@@ -540,8 +540,9 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
 'use strict';
 const SB_URL = 'https://itempqlvpaptvqlrqlke.supabase.co';
 const SB_KEY = 'sb_publishable_XePX9YH0A_1KdcEc-UV4CA_YuPWEuB7';
-// the map and place data live in the Supabase table map_data (public read). assets/map-data.json in the repo
-// is the fallback for when the database cannot be reached (it needs a web server: it does not load from file://).
+// the map and place data live in the Supabase table map_data (public read). If the database cannot be reached,
+// the same data is read from assets/map-data.json in the GitHub repo (raw path, so it also works from file://).
+const MAP_RAW = 'https://raw.githubusercontent.com/diommav/gamwtonkreza2/leaderboard/assets/map-data.json';
 async function loadMap() {
   const ok = d => d && d.v && d.g && d.gd && d.p;
   try {
@@ -552,13 +553,13 @@ async function loadMap() {
     const d = Object.fromEntries((await r.json()).map(x => [x.key, x.data]));
     if (ok(d)) return d;
     throw new Error('map_data incomplete');
-  } catch (e) { console.warn('map from database failed, trying assets/map-data.json', e); }
+  } catch (e) { console.warn('map from database failed, trying the GitHub file', e); }
   try {
-    const r = await fetch('assets/map-data.json');
-    if (!r.ok) throw new Error('assets ' + r.status);
+    const r = await fetch(MAP_RAW);
+    if (!r.ok) throw new Error('github ' + r.status);
     const d = await r.json();
     if (ok(d)) return d;
-  } catch (e) { console.warn('map file failed too', e); }
+  } catch (e) { console.warn('map from GitHub failed too', e); }
   document.body.insertAdjacentHTML('afterbegin', '<p style="padding:24px;font:16px sans-serif">Ο χάρτης δεν φορτώνει. Δοκίμασε ξανά σε λίγο.</p>');
   throw new Error('no map data');
 }
