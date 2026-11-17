@@ -116,4 +116,6 @@ Games saved with an earlier curve keep the points they got then.
 - Τρέξε το `supabase/schema.sql` σε ένα Supabase project.
 - Στα `index.html` και `practice.html` βάλε το project URL και το **publishable** key στα `SB_URL` και `SB_KEY`. Το `service_role` key δεν μπαίνει ποτέ στη σελίδα.
 - Το `practice.html` είναι το `index.html` με `const PRACTICE = true;`. Στο practice δεν στέλνεται σκορ.
+- Κάθε μέρα έχει δική της κατάταξη, και για τις παλιές μέρες από το αρχείο (σημειώνονται «αρχείο»). Οι επιλογές των άλλων φαίνονται αφού τελειώσεις την ίδια μέρα.
+- Το κουμπί «Αποσύνδεση» κάνει τη συσκευή νέο παίκτη (νέο cookie και νέο αποτύπωμα). Η παλιά κατάταξη μένει.
 - Γνωστά όρια: τα σκορ μπορούν να πλαστογραφηθούν από τον browser, δεν υπάρχει rate limiting, και δύο άνθρωποι με την ίδια συσκευή μπορεί να μοιραστούν αποτυπωτή.
