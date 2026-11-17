@@ -113,3 +113,42 @@ revoke all on function public._identify(uuid, text, text) from public, anon, aut
 grant execute on function public.submit_score(uuid, text, text, date, jsonb) to anon, authenticated;
 grant execute on function public.get_leaderboard(uuid, date) to anon, authenticated;
 grant execute on function public.delete_me(uuid) to anon, authenticated;
+
+-- Recognises a returning visitor by cookie, else by fingerprint (and links the new cookie to that player).
+create or replace function public.whoami(p_cookie uuid, p_fp text)
+returns json language plpgsql security definer set search_path to 'public' as $$
+declare
+  v_player uuid;
+  v_name text;
+begin
+  if p_cookie is null or p_fp !~ '^[0-9a-f]{64}$' then return json_build_object('name', null); end if;
+  select player_id into v_player from devices where cookie_id = p_cookie;
+  if v_player is null then
+    select player_id into v_player from devices where fp_hash = p_fp order by last_seen desc limit 1;
+    if v_player is not null then
+      insert into devices (cookie_id, player_id, fp_hash) values (p_cookie, v_player, p_fp) on conflict do nothing;
+    end if;
+  else
+    update devices set fp_hash = p_fp, last_seen = now() where cookie_id = p_cookie;
+  end if;
+  if v_player is null then return json_build_object('name', null); end if;
+  update players set last_seen = now() where id = v_player returning display_name into v_name;
+  return json_build_object('name', v_name);
+end $$;
+revoke all on function public.whoami(uuid, text) from public;
+grant execute on function public.whoami(uuid, text) to anon, authenticated;
+
+-- Saves name + cookie + fingerprint (+ readable device details) as soon as the player enters their name.
+alter table devices add column if not exists info jsonb;
+create or replace function public.register_player(p_cookie uuid, p_fp text, p_name text, p_info jsonb default null)
+returns json language plpgsql security definer set search_path to 'public' as $$
+begin
+  if p_cookie is null or p_fp !~ '^[0-9a-f]{64}$' then raise exception 'bad identity'; end if;
+  if nullif(btrim(coalesce(p_name, '')), '') is null then raise exception 'name required'; end if;
+  if p_info is not null and (jsonb_typeof(p_info) <> 'object' or length(p_info::text) > 2000) then raise exception 'bad info'; end if;
+  perform public._identify(p_cookie, p_fp, p_name);
+  update devices set info = p_info where cookie_id = p_cookie and p_info is not null;
+  return json_build_object('ok', true);
+end $$;
+revoke all on function public.register_player(uuid, text, text, jsonb) from public;
+grant execute on function public.register_player(uuid, text, text, jsonb) to anon, authenticated;
