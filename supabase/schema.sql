@@ -169,9 +169,10 @@ begin
   return v_out;
 end $$;
 
+grant execute on function public.get_leaderboard(uuid, date) to anon, authenticated;
+
 -- One player's game: a given day, or their best game when p_day is null.
 -- Today's choices stay hidden until the viewer has finished today's game too (they would give away the answers).
-grant execute on function public.get_leaderboard(uuid, date) to anon, authenticated;
 
 create or replace function public.get_game(p_cookie uuid, p_player uuid, p_day date default null)
 returns json language plpgsql security definer set search_path to 'public' as $$
