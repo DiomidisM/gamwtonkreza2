@@ -357,6 +357,8 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 ol.rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: var(--fs-3); }
 ol.rank li.me { border-color: var(--foreground); background: var(--accent-neon); font-weight: 700; }
+ol.rank li.viewing { border: 2px solid var(--foreground); background: var(--muted); box-shadow: inset 6px 0 0 var(--foreground); font-weight: 700; }
+ol.rank li.viewing .n::after { content: " · το βλέπεις"; font: 500 var(--fs-1) var(--mono); color: var(--muted-foreground); }
 ol.rank li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ol.rank li .t { font-family: var(--mono); }
 #lb .optin { display: grid; gap: 10px; padding: 12px; border: 2px solid var(--foreground); background: var(--mid); font-size: var(--fs-3); }
@@ -1833,7 +1835,8 @@ async function renderEndLb(noScroll) {
 let lbTab = 'day', lbData = null;
 const lbDay = () => (!PRACTICE && S ? S.day : todayKey());
 const fmtDur = ms => { const t = Math.round(ms / 1000); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
-const rankRow = (r, i, day) => `<li${r.me ? ' class="me"' : ''}${r.pid ? ` data-pid="${r.pid}" data-day="${day}" tabindex="0" role="button" title="Δες τις επιλογές"` : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}${r.duration_ms ? `<span class="dur">${fmtDur(r.duration_ms)}</span>` : ''}${r.late ? '<span class="dur">αρχείο</span>' : ''}</span><span class="t">${nf.format(r.total)}</span></li>`;
+let viewPid = null;  // whose game is on the map right now (from the leaderboard)
+const rankRow = (r, i, day) => `<li${r.me ? ' class="me"' : (S && S.shared && r.pid && r.pid === viewPid) ? ' class="viewing"' : ''}${r.pid ? ` data-pid="${r.pid}" data-day="${day}" tabindex="0" role="button" title="Δες τις επιλογές"` : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}${r.duration_ms ? `<span class="dur">${fmtDur(r.duration_ms)}</span>` : ''}${r.late ? '<span class="dur">αρχείο</span>' : ''}</span><span class="t">${nf.format(r.total)}</span></li>`;
 async function viewPlayer(pid, day, fromDialog) {
   const say = t => { if (fromDialog) $('#lbNote').textContent = t; else setNotice(t); };
   let g;
@@ -1846,7 +1849,7 @@ async function viewPlayer(pid, day, fromDialog) {
   if (rounds.length !== 5 || !targets.every(q => BYQ.has(q)) || !rounds.every(r => BYQ.has(r.q))) return say('Αυτό το παιχνίδι δεν μπορεί να εμφανιστεί.');
   // same read-only view a shared link opens: never saved, never counted
   S = { v: SAVE_V, day: g.day, targets, guesses: rounds.map(r => ({ q: r.q, d: r.d, pts: r.pts })), round: 4, phase: 'done', arch: g.day !== todayKey(), shared: g.name };
-  view = null; clearInput(); setNotice('');
+  view = null; clearInput(); setNotice(''); viewPid = pid;
   if (fromDialog) closeDlg($('#lb'));
   renderAll(); focusView(true); renderEndLb(true);
   $('#panel').scrollIntoView({ block: 'start', behavior: 'smooth' });
