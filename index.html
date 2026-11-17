@@ -344,6 +344,22 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 #myname { flex: 1; min-width: 0; max-width: 220px; font: 500 14px var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); }
 .notice { margin: 12px 0 0; padding: 8px 10px; border: 1.5px solid var(--foreground); background: var(--mid); font-size: 13.5px; }
 @media (prefers-reduced-motion: reduce) { .ov .tgt .pulse { animation: none; opacity: 0; } }
+
+#lb { width: min(560px, calc(100vw - 32px)); max-height: 86vh; padding: 0; overflow: auto; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
+#lb::backdrop { background: rgba(19, 17, 15, .45); }
+#lb .tabs { display: flex; gap: 8px; }
+#lb .tabs button { flex: 1; min-height: 38px; background: var(--card); border: 2px solid var(--foreground); border-radius: 0; font: 700 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); }
+#lb .tabs button[aria-pressed="true"] { background: var(--accent-neon); }
+#lb ol.rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+#lb ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: 14px; }
+#lb ol.rank li.me { border-color: var(--foreground); background: var(--accent-neon); font-weight: 700; }
+#lb ol.rank li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#lb ol.rank li .t { font-family: var(--mono); }
+#lb .optin { display: grid; gap: 10px; padding: 12px; border: 2px solid var(--foreground); background: var(--mid); font-size: 13.5px; }
+#lb .optin label.tick { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+#lb .optin .why { display: block; font-size: 12px; color: var(--muted-foreground); }
+#lb #lbname { font: 500 14px var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; max-width: 260px; }
+#lb .row2 { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -353,7 +369,7 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
     <header class="top pad">
       <div class="brand">
         <h1><span class="hname">gamwtonkreza2</span> <span class="practag" id="archtag" hidden>Αρχείο</span></h1>
-        <div class="dateline"><p class="date" id="date"></p><span class="dlinks"><button type="button" class="linkbtn" id="statsBtn">Στατιστικά</button><button type="button" class="linkbtn" id="archBtn">Αρχείο</button></span></div>
+        <div class="dateline"><p class="date" id="date"></p><span class="dlinks"><button type="button" class="linkbtn" id="statsBtn">Στατιστικά</button><button type="button" class="linkbtn" id="archBtn">Αρχείο</button><button type="button" class="linkbtn" id="lbBtn">Κατάταξη</button></span></div>
       </div>
       <p class="tag">Βρες την πόλη ή το χωριό που απεικονίζεται στο χάρτη, όσο πιο κοντά γίνεται κάθε φορά.</p>
       <div class="status">
@@ -466,6 +482,20 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
     <div class="dlg-head"><h2 id="archTitle">Αρχείο</h2><button type="button" class="dlg-close" id="archClose" aria-label="Κλείσιμο"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <ol class="days" id="archBody"></ol>
     <p class="note">Όποια μέρα δεν έπαιξες, μπορείς να την παίξεις τώρα. Τα παιχνίδια από το αρχείο δεν μετράνε στα στατιστικά.</p>
+  </div>
+</dialog>
+<dialog id="lb" lang="el" aria-labelledby="lbTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="lbTitle">Κατάταξη</h2><button type="button" class="dlg-close" id="lbClose" aria-label="Κλείσιμο"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="optin" id="lbOptin">
+      <label class="tick"><input type="checkbox" id="lbOn"><span>Συμμετέχω στην κατάταξη<span class="why">Όταν τελειώνεις το σημερινό παιχνίδι, το σκορ σου στέλνεται αυτόματα μαζί με το όνομά σου. Για να σε αναγνωρίζει ο ίδιος παίκτης την επόμενη μέρα, αποθηκεύεται ένα cookie (gk_pid) και ένας κατακερματισμένος (SHA-256) αποτυπωτής της συσκευής σου. Δεν στέλνεται IP ή email. Αν δεν το τσεκάρεις, δεν στέλνεται τίποτα.</span></span></label>
+      <div class="row2" id="lbNameRow" hidden><label for="lbname">Όνομα:</label><input id="lbname" type="text" maxlength="24" autocomplete="nickname" placeholder="π.χ. Κρέζας"><button type="button" class="primary" id="lbSave">Αποθήκευση</button></div>
+      <div class="row2" id="lbDelRow" hidden><button type="button" class="linkbtn" id="lbDel">Διαγραφή όλων των δεδομένων μου από την κατάταξη</button></div>
+      <p class="hint" id="lbMsg"></p>
+    </div>
+    <div class="tabs"><button type="button" id="lbTabDay" aria-pressed="true">Σήμερα</button><button type="button" id="lbTabAll" aria-pressed="false">Όλων των εποχών</button></div>
+    <ol class="rank" id="lbList"><li><span></span><span>Φόρτωση…</span><span></span></li></ol>
+    <p class="note" id="lbNote"></p>
   </div>
 </dialog>
 <div class="bands" id="bands" lang="el"><div class="band" id="bandKontogiannis"></div><div class="band" id="bandAchilles"></div></div>
@@ -688,7 +718,7 @@ function nextRound() {
   }
   renderAll(); focusView(true); save();
   if (S.phase === 'play' && finePointer) inp.focus({ preventScroll: true });
-  if (S.phase === 'done') { setNotice(''); $('#share').focus({ preventScroll: true }); }
+  if (S.phase === 'done') { setNotice(''); $('#share').focus({ preventScroll: true }); submitScore(); }
 }
 
 /* ---------- rendering: logbook ---------- */
@@ -1618,11 +1648,97 @@ $('#zout').addEventListener('click', () => goTo({ ...V, s: V.s / 0.55 }, true));
 $('#zfit').addEventListener('click', () => goTo(fit(fitBoxNow, fitPad), true));
 new ResizeObserver(() => { measure(); measureUi(); goTo(fit(fitBoxNow, fitPad), false); }).observe(chart);
 
+
+/* ---------- leaderboard (Supabase) ----------
+   Opt-in. The publishable key is meant to be public: the tables are locked and only the
+   three SECURITY DEFINER functions below can be called. Never put the service_role key here. */
+const SB_URL = 'https://itempqlvpaptvqlrqlke.supabase.co';
+const SB_KEY = 'sb_publishable_XePX9YH0A_1KdcEc-UV4CA_YuPWEuB7';
+const LB_KEY = 'gamwtonkreza2.lb';
+const lbOn = () => { try { return localStorage.getItem(LB_KEY) === '1'; } catch { return false; } };
+const lbSetOn = v => { try { v ? localStorage.setItem(LB_KEY, '1') : localStorage.removeItem(LB_KEY); } catch { /* storage unavailable */ } };
+const uuid4 = () => (crypto.randomUUID ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
+function getPid(create) {
+  const m = document.cookie.match(/(?:^|; )gk_pid=([0-9a-f-]{36})/);
+  if (m) return m[1];
+  if (!create) return null;
+  const id = uuid4();
+  document.cookie = `gk_pid=${id}; max-age=${60 * 60 * 24 * 365 * 2}; path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+  return id;
+}
+async function fingerprint() {
+  const n = navigator, sc = screen;
+  const raw = [n.userAgent, n.language, (n.languages || []).join(','), n.platform, n.hardwareConcurrency, n.deviceMemory, sc.width, sc.height, sc.colorDepth, devicePixelRatio, new Date().getTimezoneOffset(), Intl.DateTimeFormat().resolvedOptions().timeZone].join('||');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function rpc(fn, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(fn + ' ' + r.status);
+  return r.json();
+}
+// sends today's finished game once. Safe to call any time; does nothing unless every condition holds.
+async function submitScore() {
+  if (PRACTICE || !S || S.shared || S.arch || S.phase !== 'done' || S.day !== todayKey() || !lbOn()) return;
+  const name = (store.get('name', '') || '').trim();
+  if (!name || S.lbSent) return;
+  try {
+    await rpc('submit_score', { p_cookie: getPid(true), p_fp: await fingerprint(), p_name: name, p_day: S.day, p_rounds: S.guesses.map(g => ({ q: g.q, d: g.d, pts: g.pts })) });
+    S.lbSent = true; save();
+  } catch (e) { console.warn('leaderboard submit failed', e); }
+}
+let lbTab = 'day', lbData = null;
+function lbRender() {
+  $('#lbTabDay').setAttribute('aria-pressed', lbTab === 'day'); $('#lbTabAll').setAttribute('aria-pressed', lbTab === 'alltime');
+  const rows = lbData ? lbData[lbTab] : null;
+  $('#lbList').innerHTML = !rows ? '<li><span></span><span>Φόρτωση…</span><span></span></li>'
+    : !rows.length ? '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>'
+    : rows.map((r, i) => `<li${r.me ? ' class="me"' : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}</span><span class="t">${nf.format(r.total)}</span></li>`).join('');
+  $('#lbNote').textContent = lbData ? `Παίκτες σήμερα: ${lbData.players_today}` + (lbData.me && lbData.me.games ? ` · Το καλύτερό σου: ${nf.format(lbData.me.best)}` : '') : '';
+}
+async function lbLoad() {
+  try { lbData = await rpc('get_leaderboard', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_day: todayKey() }); }
+  catch (e) { lbData = null; $('#lbList').innerHTML = '<li><span></span><span>Η κατάταξη δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.</span><span></span></li>'; return; }
+  lbRender();
+}
+function lbOptinRender() {
+  const on = lbOn();
+  $('#lbOn').checked = on;
+  $('#lbNameRow').hidden = !on;
+  $('#lbDelRow').hidden = !on;
+  $('#lbname').value = store.get('name', '') || '';
+}
+function openLb() {
+  lbOptinRender(); $('#lbMsg').textContent = ''; lbData = null; lbRender(); lbLoad();
+  const d = $('#lb');
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+}
+$('#lbBtn').addEventListener('click', openLb);
+$('#lbClose').addEventListener('click', () => { const d = $('#lb'); if (d.close) d.close(); else d.removeAttribute('open'); });
+$('#lb').addEventListener('click', e => { if (e.target.id === 'lb' && e.target.close) e.target.close(); });
+$('#lbTabDay').addEventListener('click', () => { lbTab = 'day'; lbRender(); });
+$('#lbTabAll').addEventListener('click', () => { lbTab = 'alltime'; lbRender(); });
+$('#lbOn').addEventListener('change', e => { lbSetOn(e.target.checked); lbOptinRender(); if (e.target.checked) $('#lbname').focus(); });
+$('#lbSave').addEventListener('click', async () => {
+  const nm = $('#lbname').value.replace(/\s+/g, ' ').trim().slice(0, 24);
+  if (!nm) { $('#lbMsg').textContent = 'Γράψε ένα όνομα.'; return; }
+  store.set('name', nm); if (PRACTICE) { $('#lbMsg').textContent = 'Το όνομα αποθηκεύεται από το κανονικό παιχνίδι.'; return; }
+  $('#lbMsg').textContent = 'Αποθηκεύτηκε.';
+  await submitScore(); lbLoad();
+});
+$('#lbDel').addEventListener('click', async () => {
+  if (!confirm('Να διαγραφούν όλα τα σκορ και τα δεδομένα σου από την κατάταξη;')) return;
+  try { await rpc('delete_me', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000' }); } catch { $('#lbMsg').textContent = 'Η διαγραφή απέτυχε. Δοκίμασε ξανά.'; return; }
+  lbSetOn(false); document.cookie = 'gk_pid=; max-age=0; path=/'; if (S) { delete S.lbSent; save(); }
+  lbOptinRender(); $('#lbMsg').textContent = 'Διαγράφηκαν.'; lbLoad();
+});
+
 /* ---------- start ---------- */
 function start(data) {
   measure(); renderBand();
   if (data && validState(data.S)) { S = data.S; renderAll(); focusView(false); }
   else route(false);
+  submitScore();
 }
 window.claude?.hot?.snapshot?.(() => ({ S }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});

@@ -108,3 +108,12 @@ Games saved with an earlier curve keep the points they got then.
     [geoBoundaries](https://www.geoboundaries.org) municipalities of Greece (public domain).
     Athens' four sectors count as one prefecture and the Islands unit belongs to Piraeus,
     as before 2011.
+
+## Κατάταξη (Supabase)
+
+Το κουμπί «Κατάταξη» δείχνει την κατάταξη της μέρας και όλων των εποχών. Η συμμετοχή είναι προαιρετική (opt-in): μόνο αν την ενεργοποιήσει ο παίκτης, το σκορ στέλνεται αυτόματα όταν τελειώσει το σημερινό παιχνίδι. Ο παίκτης αναγνωρίζεται από το cookie `gk_pid` και έναν SHA-256 αποτυπωτή της συσκευής. Το κουμπί «Διαγραφή» σβήνει όλα τα δεδομένα του.
+
+- Τρέξε το `supabase/schema.sql` σε ένα Supabase project.
+- Στα `index.html` και `practice.html` βάλε το project URL και το **publishable** key στα `SB_URL` και `SB_KEY`. Το `service_role` key δεν μπαίνει ποτέ στη σελίδα.
+- Το `practice.html` είναι το `index.html` με `const PRACTICE = true;`. Στο practice δεν στέλνεται σκορ.
+- Γνωστά όρια: τα σκορ μπορούν να πλαστογραφηθούν από τον browser, δεν υπάρχει rate limiting, και δύο άνθρωποι με την ίδια συσκευή μπορεί να μοιραστούν αποτυπωτή.
