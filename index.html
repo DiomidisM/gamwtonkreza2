@@ -360,6 +360,10 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 #lb .optin .why { display: block; font-size: 12px; color: var(--muted-foreground); }
 #lb #lbname { font: 500 14px var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; max-width: 260px; }
 #lb .row2 { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#who { width: min(440px, calc(100vw - 32px)); padding: 0; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
+#who::backdrop { background: rgba(19, 17, 15, .6); }
+#who .why { font-size: 12px; color: var(--muted-foreground); margin: 0; }
+#who #whoname { font: 500 16px var(--body); padding: 9px 11px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; box-sizing: border-box; }
 </style>
 </head>
 <body>
@@ -497,6 +501,16 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
     <ol class="rank" id="lbList"><li><span></span><span>Φόρτωση…</span><span></span></li></ol>
     <p class="note" id="lbNote"></p>
   </div>
+</dialog>
+<dialog id="who" lang="el" aria-labelledby="whoTitle">
+  <form class="dlg" id="whoForm" method="dialog">
+    <div class="dlg-head"><h2 id="whoTitle">Ποιος είσαι;</h2></div>
+    <p style="margin:0">Γράψε το όνομά σου για να μπεις στην κατάταξη της παρέας. Το σκορ σου θα στέλνεται αυτόματα όταν τελειώνεις το σημερινό παιχνίδι.</p>
+    <input id="whoname" type="text" maxlength="24" autocomplete="nickname" placeholder="π.χ. Κρέζας" required>
+    <button type="submit" class="primary" id="whoGo">Μπες στο παιχνίδι</button>
+    <p class="why" id="whoMsg"></p>
+    <p class="why">Για να σε αναγνωρίζει την επόμενη μέρα, αποθηκεύεται ένα cookie (gk_pid) και ένας κατακερματισμένος (SHA-256) αποτυπωτής της συσκευής σου. Δεν στέλνεται IP ή email. Μπορείς να τα σβήσεις από το «Κατάταξη».</p>
+  </form>
 </dialog>
 <div class="bands" id="bands" lang="el"><div class="band" id="bandKontogiannis"></div><div class="band" id="bandAchilles"></div></div>
 <div id="probe" style="position:fixed;visibility:hidden;pointer-events:none;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)"></div>
@@ -1704,6 +1718,7 @@ async function lbLoad() {
 function lbOptinRender() {
   const on = lbOn();
   $('#lbOn').checked = on;
+  $('#lbOn').closest('label').hidden = true;
   $('#lbNameRow').hidden = !on;
   $('#lbDelRow').hidden = !on;
   $('#lbname').value = store.get('name', '') || '';
@@ -1733,12 +1748,33 @@ $('#lbDel').addEventListener('click', async () => {
   lbOptinRender(); $('#lbMsg').textContent = 'Διαγράφηκαν.'; lbLoad();
 });
 
+/* ---------- entry gate: everyone must pick a name before playing ---------- */
+function whoGate() {
+  if (PRACTICE) return;
+  const nm = (store.get('name', '') || '').trim();
+  if (lbOn() && nm) return;
+  const d = $('#who');
+  $('#whoname').value = nm;
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+  $('#whoname').focus();
+}
+$('#who').addEventListener('cancel', e => e.preventDefault());  // Esc can't dismiss it
+$('#whoForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nm = $('#whoname').value.replace(/\s+/g, ' ').trim().slice(0, 24);
+  if (!nm) { $('#whoMsg').textContent = 'Γράψε ένα όνομα.'; return; }
+  store.set('name', nm); lbSetOn(true);
+  const d = $('#who'); if (d.close) d.close(); else d.removeAttribute('open');
+  if (S && S.phase === 'done') await submitScore();
+});
+
 /* ---------- start ---------- */
 function start(data) {
   measure(); renderBand();
   if (data && validState(data.S)) { S = data.S; renderAll(); focusView(false); }
   else route(false);
   submitScore();
+  whoGate();
 }
 window.claude?.hot?.snapshot?.(() => ({ S }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
