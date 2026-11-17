@@ -54,54 +54,6 @@ begin
   return v_player;
 end $$;
 
-create or replace function public.submit_score(p_cookie uuid, p_fp text, p_name text, p_day date, p_rounds jsonb)
-returns json language plpgsql security definer set search_path to 'public' as $$
-declare
-  v_player uuid;
-  v_total  int;
-  v_today  date := (now() at time zone 'Europe/Athens')::date;
-begin
-  if p_cookie is null or p_fp !~ '^[0-9a-f]{64}$' then raise exception 'bad identity'; end if;
-  if p_day <> v_today then raise exception 'only today counts'; end if;
-  if jsonb_typeof(p_rounds) <> 'array' or jsonb_array_length(p_rounds) <> 5 then raise exception 'need 5 rounds'; end if;
-  if exists (select 1 from jsonb_array_elements(p_rounds) r
-             where (r->>'pts') is null or (r->>'pts')::int not between 0 and 1000) then
-    raise exception 'bad points';
-  end if;
-  select sum((r->>'pts')::int) into v_total from jsonb_array_elements(p_rounds) r;
-  v_player := public._identify(p_cookie, p_fp, p_name);
-  insert into scores (player_id, day, total, rounds) values (v_player, p_day, v_total, p_rounds)
-    on conflict (player_id, day) do nothing;
-  return json_build_object('ok', true);
-end $$;
-
-create or replace function public.get_leaderboard(p_cookie uuid, p_day date)
-returns json language plpgsql security definer set search_path to 'public' as $$
-declare
-  v_me uuid;
-  v_out json;
-begin
-  select player_id into v_me from devices where cookie_id = p_cookie;
-  select json_build_object(
-    'day', (select coalesce(json_agg(t), '[]'::json) from (
-        select pl.display_name as name, s.total, (s.player_id = v_me) as me
-        from scores s join players pl on pl.id = s.player_id
-        where s.day = p_day order by s.total desc, s.created_at limit 20) t),
-    'alltime', (select coalesce(json_agg(t), '[]'::json) from (
-        select pl.display_name as name, b.best as total, (b.player_id = v_me) as me
-        from (select player_id, max(total) as best, min(created_at) as at from scores group by player_id) b
-        join players pl on pl.id = b.player_id order by b.best desc, b.at limit 20) t),
-    'me', (select json_build_object(
-        'best', max(total), 'games', count(*),
-        'today_rank', (select case when t.total is null then null
-                       else (select count(*) + 1 from scores x where x.day = p_day and x.total > t.total) end
-                       from (select (select total from scores where player_id = v_me and day = p_day) as total) t))
-        from scores where player_id = v_me),
-    'players_today', (select count(*) from scores where day = p_day)
-  ) into v_out;
-  return v_out;
-end $$;
-
 create or replace function public.delete_me(p_cookie uuid)
 returns json language plpgsql security definer set search_path to 'public' as $$
 begin
@@ -110,8 +62,6 @@ begin
 end $$;
 
 revoke all on function public._identify(uuid, text, text) from public, anon, authenticated;
-grant execute on function public.submit_score(uuid, text, text, date, jsonb) to anon, authenticated;
-grant execute on function public.get_leaderboard(uuid, date) to anon, authenticated;
 grant execute on function public.delete_me(uuid) to anon, authenticated;
 
 -- Recognises a returning visitor by cookie, else by fingerprint (and links the new cookie to that player).
@@ -152,3 +102,99 @@ begin
 end $$;
 revoke all on function public.register_player(uuid, text, text, jsonb) from public;
 grant execute on function public.register_player(uuid, text, text, jsonb) to anon, authenticated;
+
+-- Full game data, clickable leaderboard (get_game hides today's choices until the viewer has finished today's game).
+alter table scores add column if not exists meta jsonb;
+alter table scores add column if not exists duration_ms integer;
+alter table scores add column if not exists started_at timestamptz;
+
+drop function if exists public.submit_score(uuid, text, text, date, jsonb);
+create or replace function public.submit_score(p_cookie uuid, p_fp text, p_name text, p_day date, p_rounds jsonb, p_meta jsonb default null)
+returns json language plpgsql security definer set search_path to 'public' as $$
+declare
+  v_player uuid;
+  v_total  int;
+  v_today  date := (now() at time zone 'Europe/Athens')::date;
+  v_dur    int;
+  v_start  timestamptz;
+begin
+  if p_cookie is null or p_fp !~ '^[0-9a-f]{64}$' then raise exception 'bad identity'; end if;
+  if p_day <> v_today then raise exception 'only today counts'; end if;
+  if jsonb_typeof(p_rounds) <> 'array' or jsonb_array_length(p_rounds) <> 5 then raise exception 'need 5 rounds'; end if;
+  if exists (select 1 from jsonb_array_elements(p_rounds) r
+             where (r->>'pts') is null or (r->>'pts')::int not between 0 and 1000) then
+    raise exception 'bad points';
+  end if;
+  if length(p_rounds::text) > 8000 or length(coalesce(p_meta, '{}'::jsonb)::text) > 4000 then raise exception 'too big'; end if;
+  if p_meta is not null and jsonb_typeof(p_meta) <> 'object' then raise exception 'bad meta'; end if;
+  select sum((r->>'pts')::int) into v_total from jsonb_array_elements(p_rounds) r;
+  begin v_dur := (p_meta->>'duration_ms')::bigint; if v_dur < 0 or v_dur > 172800000 then v_dur := null; end if;
+  exception when others then v_dur := null; end;
+  begin v_start := to_timestamp((p_meta->>'started')::double precision / 1000);
+  exception when others then v_start := null; end;
+
+  v_player := public._identify(p_cookie, p_fp, p_name);
+  insert into scores (player_id, day, total, rounds, meta, duration_ms, started_at)
+    values (v_player, p_day, v_total, p_rounds, p_meta, v_dur, v_start)
+    on conflict (player_id, day) do nothing;
+  return json_build_object('ok', true);
+end $$;
+revoke all on function public.submit_score(uuid, text, text, date, jsonb, jsonb) from public;
+grant execute on function public.submit_score(uuid, text, text, date, jsonb, jsonb) to anon, authenticated;
+
+create or replace function public.get_leaderboard(p_cookie uuid, p_day date)
+returns json language plpgsql security definer set search_path to 'public' as $$
+declare
+  v_me uuid;
+  v_out json;
+begin
+  select player_id into v_me from devices where cookie_id = p_cookie;
+  select json_build_object(
+    'day', (select coalesce(json_agg(t), '[]'::json) from (
+        select pl.id as pid, pl.display_name as name, s.total, s.duration_ms, (s.player_id = v_me) as me
+        from scores s join players pl on pl.id = s.player_id
+        where s.day = p_day order by s.total desc, s.created_at limit 20) t),
+    'alltime', (select coalesce(json_agg(t), '[]'::json) from (
+        select pl.id as pid, pl.display_name as name, b.best as total, (b.player_id = v_me) as me
+        from (select player_id, max(total) as best, min(created_at) as at from scores group by player_id) b
+        join players pl on pl.id = b.player_id order by b.best desc, b.at limit 20) t),
+    'me', (select json_build_object(
+        'best', max(total), 'games', count(*),
+        'today_rank', (select case when t.total is null then null
+                       else (select count(*) + 1 from scores x where x.day = p_day and x.total > t.total) end
+                       from (select (select total from scores where player_id = v_me and day = p_day) as total) t))
+        from scores where player_id = v_me),
+    'players_today', (select count(*) from scores where day = p_day)
+  ) into v_out;
+  return v_out;
+end $$;
+
+-- One player's game: a given day, or their best game when p_day is null.
+-- Today's choices stay hidden until the viewer has finished today's game too (they would give away the answers).
+grant execute on function public.get_leaderboard(uuid, date) to anon, authenticated;
+
+create or replace function public.get_game(p_cookie uuid, p_player uuid, p_day date default null)
+returns json language plpgsql security definer set search_path to 'public' as $$
+declare
+  v_me uuid;
+  v_today date := (now() at time zone 'Europe/Athens')::date;
+  g scores%rowtype;
+  v_name text;
+begin
+  select player_id into v_me from devices where cookie_id = p_cookie;
+  if p_day is null then
+    select * into g from scores where player_id = p_player order by total desc, created_at limit 1;
+  else
+    select * into g from scores where player_id = p_player and day = p_day;
+  end if;
+  if not found then return json_build_object('found', false); end if;
+  if g.day = v_today and p_player is distinct from v_me
+     and not exists (select 1 from scores where player_id = v_me and day = v_today) then
+    return json_build_object('found', true, 'locked', true);
+  end if;
+  select display_name into v_name from players where id = p_player;
+  return json_build_object('found', true, 'locked', false, 'name', v_name, 'day', g.day,
+                           'total', g.total, 'duration_ms', g.duration_ms, 'rounds', g.rounds);
+end $$;
+revoke all on function public.get_game(uuid, uuid, date) from public;
+grant execute on function public.get_game(uuid, uuid, date) to anon, authenticated;

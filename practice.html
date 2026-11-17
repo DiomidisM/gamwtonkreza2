@@ -15,6 +15,7 @@
    One light look on every device, in WorldsWire's exact light palette: black text and
    outlines on beige, a green target dot and a blue guess dot. Inter for text, IBM Plex
    Mono for numbers and labels (it has no Greek letters, so Greek falls back to Inter). */
+:root { --fs-1: 11px; --fs-2: 12px; --fs-3: 14px; --fs-4: 16px; --fs-5: 20px; --fs-6: 24px; --fs-7: 28px; --fs-8: 32px; --fs-9: 64px; }
 :root {
   --background: #f5f1ec;
   --foreground: #13110f;
@@ -45,7 +46,7 @@
 html { box-sizing: border-box; -webkit-text-size-adjust: 100%; }
 *, *::before, *::after { box-sizing: inherit; }
 [hidden] { display: none !important; }
-body { margin: 0; background: var(--background); color: var(--foreground); font: 15px/1.45 var(--body); }
+body { margin: 0; background: var(--background); color: var(--foreground); font: var(--fs-4)/1.45 var(--body); }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: var(--foreground); text-decoration-style: dotted; text-underline-offset: 4px; }
@@ -113,14 +114,14 @@ a:hover { text-decoration-style: solid; }
 #ovx.far .isl text { font-size: 8.5px; fill-opacity: .85; }
 .ov .isl.sm text { font-size: 8.5px; }
 #ovx.far .isl.sm text { font-size: 7px; }
-.mapopts { position: absolute; top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); background: var(--card); border: 2px solid var(--foreground); font: 600 10.5px var(--mono); letter-spacing: .08em; cursor: default; }
+.mapopts { position: absolute; top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); background: var(--card); border: 2px solid var(--foreground); font: 600 var(--fs-1) var(--mono); letter-spacing: .08em; cursor: default; }
 .mapopts .mo-head { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; font: inherit; letter-spacing: .1em; text-transform: uppercase; }
 .mapopts .mo-head:hover { background: var(--accent-neon); }
 .mapopts .mo-head span { display: inline-block; margin-left: 4px; transition: transform .2s; }
 .mapopts.closed .mo-head span { transform: rotate(-90deg); }
 .mapopts .mo-body { display: grid; gap: 6px; padding: 0 10px 9px; }
 .mapopts.closed .mo-body { display: none; }
-.mapopts .mo-note { position: absolute; left: 10px; bottom: 9px; width: 86px; margin: 0; padding-left: 10px; text-indent: -10px; line-height: 1.12; font-size: 8.5px !important; font: 400 10.5px var(--body); letter-spacing: 0; color: var(--suburb); }
+.mapopts .mo-note { position: absolute; left: 10px; bottom: 9px; width: 86px; margin: 0; padding-left: 10px; text-indent: -10px; line-height: 1.12; font-size: 8.5px !important; font: 400 var(--fs-1) var(--body); letter-spacing: 0; color: var(--suburb); }
 .mapopts .mo-note i { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border: 1.4px solid var(--suburb); border-radius: 50%; }
 .mapopts .row { display: flex; align-items: center; gap: 8px; }
 .mapopts .lbl { min-width: 82px; color: var(--muted-foreground); text-transform: uppercase; }
@@ -162,13 +163,13 @@ a:hover { text-decoration-style: solid; }
 .ov .num text { font: 700 11px var(--mono); fill: var(--dot-ring); text-anchor: middle; dominant-baseline: central; }
 
 /* a place's card: tap a name, a dot, a star or a game mark (never while a round is being played) */
-.pcard { position: absolute; z-index: 6; width: 236px; padding: 10px 12px 11px; background: var(--card); border: 2px solid var(--foreground); box-shadow: 4px 4px 0 var(--shadow); font-size: 13px; line-height: 1.4; cursor: default; user-select: text; -webkit-user-select: text; }
-.pcard h3 { margin: 0 24px 0 0; font: 800 17px/1.2 var(--body); letter-spacing: -.01em; }
-.pcard .reg { display: block; margin-top: 1px; font-size: 13px; }
+.pcard { position: absolute; z-index: 6; width: 236px; padding: 10px 12px 11px; background: var(--card); border: 2px solid var(--foreground); box-shadow: 4px 4px 0 var(--shadow); font-size: var(--fs-3); line-height: 1.4; cursor: default; user-select: text; -webkit-user-select: text; }
+.pcard h3 { margin: 0 24px 0 0; font: 800 var(--fs-4)/1.2 var(--body); letter-spacing: -.01em; }
+.pcard .reg { display: block; margin-top: 1px; font-size: var(--fs-3); }
 .pcard p { margin: 6px 0 0; color: var(--muted-foreground); }
 .pcard p b { color: var(--foreground); font-weight: 600; }
 .pcard .sub { color: var(--suburb); }
-.pcard .links { display: flex; gap: 16px; margin-top: 9px; font: 600 12px var(--body); }
+.pcard .links { display: flex; gap: 16px; margin-top: 9px; font: 600 var(--fs-2) var(--body); }
 .pcard .x { position: absolute; top: 5px; right: 5px; width: 26px; height: 26px; display: grid; place-items: center; background: none; border: 0; padding: 0; color: var(--foreground); }
 .pcard .x:hover { background: var(--accent-neon); }
 .pcard .x svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; fill: none; }
@@ -181,36 +182,36 @@ a:hover { text-decoration-style: solid; }
 
 /* ---------- side column ---------- */
 .top { padding-block: 22px 18px; }
-.brand h1 { font: 800 32px/1.05 var(--body); letter-spacing: -.025em; margin: 0; }
+.brand h1 { font: 800 var(--fs-8)/1.05 var(--body); letter-spacing: -.025em; margin: 0; }
 /* the tag (Αρχείο / Προβολή) stays beside the name when it fits, else goes under it, whole */
 .brand h1 .practag, .brand h1 .hname { white-space: nowrap; }
-.brand h1 .practag { font-size: 10px; padding: 2px 6px; }
+.brand h1 .practag { font-size: var(--fs-1); padding: 2px 6px; }
 .dateline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-top: 8px; }
 .dateline .linkbtn { margin: 0; }
 .dlinks { display: inline-flex; gap: 14px; }
-.practag { display: inline-block; vertical-align: middle; margin-left: 4px; padding: 3px 7px; background: var(--accent-neon); border: 1.5px solid var(--foreground); font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
-.date { margin: 0; font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); }
-.tag { margin: 6px 0 0; color: var(--muted-foreground); font-size: 14px; max-width: 34ch; }
+.practag { display: inline-block; vertical-align: middle; margin-left: 4px; padding: 3px 7px; background: var(--accent-neon); border: 1.5px solid var(--foreground); font: 600 var(--fs-1) var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.date { margin: 0; font: 500 var(--fs-1) var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); }
+.tag { margin: 6px 0 0; color: var(--muted-foreground); font-size: var(--fs-3); max-width: 34ch; }
 .status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-top: 18px; }
 .pips { display: flex; gap: 5px; }
-.pip { width: 38px; height: 26px; border: 1.5px dashed var(--border); display: grid; place-items: center; font: 600 11px var(--mono); font-variant-numeric: tabular-nums; color: var(--dot-ring); }
+.pip { width: 38px; height: 26px; border: 1.5px dashed var(--border); display: grid; place-items: center; font: 600 var(--fs-1) var(--mono); font-variant-numeric: tabular-nums; color: var(--dot-ring); }
 .pip.cur { border: 2px solid var(--foreground); }
 .pip.good, .pip.mid, .pip.bad { border: 1.5px solid var(--foreground); }
 .pip.good { background: var(--good); } .pip.mid { background: var(--mid); } .pip.bad { background: var(--bad); color: var(--card); }
 /* after the game the pips are buttons: each opens its round's card again */
-button.pip { padding: 0; border-radius: 0; font: 600 11px var(--mono); font-variant-numeric: tabular-nums; color: var(--dot-ring); transition: transform .12s; }
+button.pip { padding: 0; border-radius: 0; font: 600 var(--fs-1) var(--mono); font-variant-numeric: tabular-nums; color: var(--dot-ring); transition: transform .12s; }
 button.pip.bad { color: var(--card); }
 button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foreground); }
 .pip.sel { transform: translateY(-3px); box-shadow: 0 3px 0 var(--foreground); outline: 2px solid var(--foreground); outline-offset: 1px; }
-.total { font: 800 26px/1 var(--body); letter-spacing: -.03em; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.total small { font: 500 12px var(--mono); letter-spacing: 0; color: var(--muted-foreground); margin-left: 3px; }
+.total { font: 800 var(--fs-7)/1 var(--body); letter-spacing: -.03em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.total small { font: 500 var(--fs-2) var(--mono); letter-spacing: 0; color: var(--muted-foreground); margin-left: 3px; }
 
 .panel { padding-block: 18px 22px; border-top: 2px solid var(--foreground); }
-.eyebrow { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 8px; }
-.eyebrow.who { font: 700 20px/1.3 var(--body); letter-spacing: .01em; text-transform: uppercase; color: var(--bad); margin: 0 0 10px; }
-.q { display: block; font: 800 20px/1.25 var(--body); letter-spacing: -.02em; margin: 0 0 12px; text-wrap: balance; }
+.eyebrow { font: 500 var(--fs-1) var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); margin: 0 0 8px; }
+.eyebrow.who { font: 700 var(--fs-5)/1.3 var(--body); letter-spacing: .01em; text-transform: uppercase; color: var(--bad); margin: 0 0 10px; }
+.q { display: block; font: 800 var(--fs-5)/1.25 var(--body); letter-spacing: -.02em; margin: 0 0 12px; text-wrap: balance; }
 .combo { position: relative; }
-#guess { width: 100%; font: 500 18px var(--body); padding: 11px 14px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); }
+#guess { width: 100%; font: 500 var(--fs-5) var(--body); padding: 11px 14px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); }
 #guess::placeholder { color: var(--muted-foreground); opacity: .75; }
 #sugg { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 5; list-style: none; margin: 0; padding: 0; background: var(--card); border: 2px solid var(--foreground); box-shadow: 4px 4px 0 var(--shadow); max-height: 320px; overflow-y: auto; }
 #sugg li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 12px; border-top: 1px solid var(--muted); cursor: pointer; }
@@ -219,115 +220,115 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 #sugg .sn { min-width: 0; }
 #sugg .sn b { font-weight: 600; }
 .reg { color: var(--muted-foreground); font-weight: 400; }
-#sugg .sp { font: 500 11.5px var(--mono); color: var(--muted-foreground); white-space: nowrap; }
+#sugg .sp { font: 500 var(--fs-2) var(--mono); color: var(--muted-foreground); white-space: nowrap; }
 @media (max-width: 859.98px) { #sugg { top: auto; bottom: calc(100% + 4px); max-height: 46vh; } }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 14px; }
 .primary { min-height: 48px; padding: 0 20px; background: var(--foreground); color: var(--background); border: 2px solid var(--foreground); border-radius: 0;
-  font: 700 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+  font: 700 var(--fs-3) var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .primary:hover { background: var(--accent-neon); color: var(--dot-ring); }
-.hint { margin: 0; color: var(--muted-foreground); font-size: 13.5px; flex: 1 1 200px; }
+.hint { margin: 0; color: var(--muted-foreground); font-size: var(--fs-3); flex: 1 1 200px; }
 .hint.err { color: var(--destructive); font-weight: 500; }
 
-.place { font: 800 26px/1.15 var(--body); letter-spacing: -.025em; margin: 0; text-wrap: balance; }
-.meta { margin: 6px 0 0; font-size: 13px; color: var(--muted-foreground); }
+.place { font: 800 var(--fs-7)/1.15 var(--body); letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+.meta { margin: 6px 0 0; font-size: var(--fs-3); color: var(--muted-foreground); }
 .stats { display: grid; grid-template-columns: 1fr 1fr; margin: 16px 0 0; border: 2px solid var(--foreground); background: var(--card); }
 .stats div { padding: 12px 14px 11px; min-width: 0; }
 .stats div:nth-child(even) { border-left: 2px solid var(--foreground); }
 .stats div:nth-child(n+3) { border-top: 2px solid var(--foreground); }
-.stats dt { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); }
-.stats dd { margin: 5px 0 0; font: 800 30px/1 var(--body); letter-spacing: -.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.stats dd small { font: 500 13px var(--mono); letter-spacing: 0; color: var(--muted-foreground); margin-left: 4px; }
-.stats .sub { display: block; margin-top: 5px; font: 400 12.5px/1.3 var(--body); letter-spacing: 0; color: var(--muted-foreground); white-space: normal; }
+.stats dt { font: 500 var(--fs-1) var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted-foreground); }
+.stats dd { margin: 5px 0 0; font: 800 var(--fs-8)/1 var(--body); letter-spacing: -.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stats dd small { font: 500 var(--fs-3) var(--mono); letter-spacing: 0; color: var(--muted-foreground); margin-left: 4px; }
+.stats .sub { display: block; margin-top: 5px; font: 400 var(--fs-2)/1.3 var(--body); letter-spacing: 0; color: var(--muted-foreground); white-space: normal; }
 .tone { display: inline-block; width: .5em; height: .5em; margin-right: .25em; vertical-align: .12em; border: 1.5px solid var(--foreground); }
 .tone.good { background: var(--good); } .tone.mid { background: var(--mid); } .tone.bad { background: var(--bad); }
 .yours { margin: 12px 0 0; }
 .final { display: flex; align-items: baseline; gap: 4px; }
-.final .big { font: 800 64px/1 var(--body); letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
-.final small { font: 500 14px var(--mono); color: var(--muted-foreground); }
-.best { margin: 12px 0 0; font-size: 13.5px; color: var(--muted-foreground); }
-#sharetext { width: 100%; margin-top: 10px; font: 13px var(--mono); padding: 8px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); resize: none; }
+.final .big { font: 800 var(--fs-9)/1 var(--body); letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.final small { font: 500 var(--fs-3) var(--mono); color: var(--muted-foreground); }
+.best { margin: 12px 0 0; font-size: var(--fs-3); color: var(--muted-foreground); }
+#sharetext { width: 100%; margin-top: 10px; font: var(--fs-3) var(--mono); padding: 8px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); resize: none; }
 .nextgame { margin-top: 20px; padding-top: 14px; border-top: 1px dashed var(--border); }
-.nextgame b { display: block; font: 600 28px/1.1 var(--mono); font-variant-numeric: tabular-nums; }
-.nextgame p { margin: 6px 0 0; font-size: 13px; color: var(--muted-foreground); }
+.nextgame b { display: block; font: 600 var(--fs-7)/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.nextgame p { margin: 6px 0 0; font-size: var(--fs-3); color: var(--muted-foreground); }
 
 .log { padding-block: 16px 28px; border-top: 2px solid var(--foreground); }
 .rounds { list-style: none; margin: 0; padding: 0; }
 .rounds li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--border); }
-.rounds .n { font: 500 12px var(--mono); color: var(--muted-foreground); }
+.rounds .n { font: 500 var(--fs-2) var(--mono); color: var(--muted-foreground); }
 .rounds b { font-weight: 600; }
-.rounds small { display: block; color: var(--muted-foreground); font-size: 12.5px; }
-.rounds .p { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; }
+.rounds small { display: block; color: var(--muted-foreground); font-size: var(--fs-2); }
+.rounds .p { font: 600 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; }
 .rounds .todo { color: var(--muted-foreground); }
 .rounds li.pick { cursor: pointer; margin-inline: -8px; padding-inline: 8px; }
 .rounds li.pick:hover { background: var(--muted); }
 .rounds li.sel { background: var(--muted); box-shadow: inset 4px 0 0 var(--foreground); }
-.credits { margin: 22px 0 0; font-size: 12px; color: var(--muted-foreground); }
+.credits { margin: 22px 0 0; font-size: var(--fs-2); color: var(--muted-foreground); }
 
 @media (max-width: 859.98px) {
   /* on phones the counter boxes sit at the end of the page, so they never cover the answer box */
   .bands { position: static; max-width: none; padding: 0 max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
   .top { padding-block: 14px 12px; }
   .brand { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
-  .brand h1 { font-size: 28px; }
+  .brand h1 { font-size: var(--fs-7); }
   .dateline { margin: 0; flex-direction: column; align-items: flex-end; }
   .date { text-align: right; }
   .tag { display: none; }
   .status { margin-top: 10px; }
   .pip { width: 36px; }
-  .total { font-size: 24px; }
+  .total { font-size: var(--fs-6); }
   .panel { border-top: 0; }
 }
-@media (max-width: 380px) { .pip { width: 33px; font-size: 10px; } .pips { gap: 4px; } .total { font-size: 21px; } .stats dd { font-size: 26px; } }
+@media (max-width: 380px) { .pip { width: 33px; font-size: var(--fs-1); } .pips { gap: 4px; } .total { font-size: var(--fs-5); } .stats dd { font-size: var(--fs-7); } }
 /* ---------- statistics window ---------- */
-.linkbtn { background: none; border: 0; padding: 0; margin-top: 6px; font: 600 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--foreground); text-decoration: underline dotted; text-underline-offset: 4px; }
+.linkbtn { background: none; border: 0; padding: 0; margin-top: 6px; font: 600 var(--fs-1) var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--foreground); text-decoration: underline dotted; text-underline-offset: 4px; }
 .linkbtn:hover { text-decoration-style: solid; }
 /* the Marilena button sits under "Αντιγραφή αποτελέσματος", exactly as wide as it */
 .sharecol { display: inline-flex; flex-direction: column; gap: 8px; }
-.tinybtn { width: 100%; background: #efebe6; border: 1.5px solid var(--border); border-radius: 0; padding: 5px 6px; font: 400 11px/1.3 var(--body); color: var(--muted-foreground); text-align: center; white-space: nowrap; }
+.tinybtn { width: 100%; background: #efebe6; border: 1.5px solid var(--border); border-radius: 0; padding: 5px 6px; font: 400 var(--fs-1)/1.3 var(--body); color: var(--muted-foreground); text-align: center; white-space: nowrap; }
 .tinybtn:hover { border-color: var(--foreground); color: var(--foreground); background: var(--accent-neon); }
-.secondary { min-height: 48px; padding: 0 18px; background: transparent; color: var(--foreground); border: 2px solid var(--foreground); border-radius: 0; font: 700 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.secondary { min-height: 48px; padding: 0 18px; background: transparent; color: var(--foreground); border: 2px solid var(--foreground); border-radius: 0; font: 700 var(--fs-3) var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .secondary:hover { background: var(--accent-neon); color: var(--dot-ring); }
 #stats, #arch { width: min(560px, calc(100vw - 32px)); max-height: 86vh; padding: 0; overflow: auto; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
 #stats::backdrop, #arch::backdrop { background: rgba(19, 17, 15, .45); }
 .dlg { padding: 20px 22px 24px; display: grid; gap: 16px; }
 .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--foreground); padding-bottom: 12px; }
-.dlg-head h2 { margin: 0; font: 800 24px/1.1 var(--body); letter-spacing: -.025em; }
+.dlg-head h2 { margin: 0; font: 800 var(--fs-6)/1.1 var(--body); letter-spacing: -.025em; }
 .dlg-close { width: 38px; height: 38px; display: grid; place-items: center; background: var(--card); border: 2px solid var(--foreground); padding: 0; }
 .dlg-close:hover { background: var(--accent-neon); }
 .dlg-close svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 2px solid var(--foreground); background: var(--card); margin: 0; }
 .tiles div { padding: 12px 12px 11px; min-width: 0; border-left: 2px solid var(--foreground); }
 .tiles div:first-child { border-left: 0; }
-.tiles dt { font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
-.tiles dd { margin: 5px 0 0; font: 800 26px/1 var(--body); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.tiles .sub { display: block; margin-top: 4px; font: 400 11.5px/1.3 var(--body); letter-spacing: 0; color: var(--muted-foreground); }
+.tiles dt { font: 500 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+.tiles dd { margin: 5px 0 0; font: 800 var(--fs-7)/1 var(--body); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.tiles .sub { display: block; margin-top: 4px; font: 400 var(--fs-2)/1.3 var(--body); letter-spacing: 0; color: var(--muted-foreground); }
 @media (max-width: 520px) { .tiles { grid-template-columns: 1fr 1fr; } .tiles div:nth-child(3) { border-left: 0; } .tiles div:nth-child(n+3) { border-top: 2px solid var(--foreground); } }
 .dlg .stats { margin: 0; }
 .past { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .past li { border-bottom: 1px solid var(--border); }
 .past summary { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 12px; align-items: center; padding: 11px 2px; cursor: pointer; list-style: none; }
 .past summary::-webkit-details-marker { display: none; }
-.past summary::after { content: "+"; font: 600 15px var(--mono); width: 1em; text-align: center; }
+.past summary::after { content: "+"; font: 600 var(--fs-4) var(--mono); width: 1em; text-align: center; }
 .past details[open] summary::after { content: "−"; }
 .past .pd { font-weight: 600; }
-.past .pt { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; }
+.past .pt { font: 600 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; }
 .sq { display: inline-flex; gap: 3px; }
 .sq i { width: 11px; height: 11px; border: 1.5px solid var(--foreground); }
 .sq i.good { background: var(--good); } .sq i.mid { background: var(--mid); } .sq i.bad { background: var(--bad); }
 .past .rounds { margin: 0 0 10px; }
 .past .rounds li:last-child { border-bottom: 0; }
 .empty { margin: 0; padding: 14px; border: 2px dashed var(--border); color: var(--muted-foreground); }
-.dlg .note { margin: 0; font-size: 12.5px; color: var(--muted-foreground); }
+.dlg .note { margin: 0; font-size: var(--fs-2); color: var(--muted-foreground); }
 /* the archive: every day from #1 to today, newest first */
 .days { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .days li { border-bottom: 1px solid var(--border); }
 .days button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 11px 6px; background: none; border: 0; text-align: left; }
 .days button:hover { background: var(--accent-neon); }
-.days .dn { font: 600 12px var(--mono); color: var(--muted-foreground); margin-right: 6px; }
+.days .dn { font: 600 var(--fs-2) var(--mono); color: var(--muted-foreground); margin-right: 6px; }
 .days .pd { font-weight: 600; }
-.days .pt { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; min-width: 3.4em; text-align: right; }
-.days .go { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; min-width: 3.4em; text-align: right; white-space: nowrap; }
-.days .muted { color: var(--muted-foreground); font-size: 13px; }
+.days .pt { font: 600 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; min-width: 3.4em; text-align: right; }
+.days .go { font: 600 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; min-width: 3.4em; text-align: right; white-space: nowrap; }
+.days .muted { color: var(--muted-foreground); font-size: var(--fs-3); }
 .days .atag { display: inline-block; margin-left: 6px; padding: 1px 5px; border: 1px solid var(--border); font: 500 9.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); vertical-align: 1px; }
 .days .ds { display: none; }
 .days .today { font-weight: 400; color: var(--muted-foreground); }
@@ -335,39 +336,54 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 .days li.cur button { box-shadow: inset 4px 0 0 var(--foreground); }
 /* sharing the exact answers: a tick box under the copy buttons, and the name it is shared under */
 .sharelink { margin-top: 14px; display: grid; gap: 8px; }
-.sharelink label.tick { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; cursor: pointer; }
+.sharelink label.tick { display: flex; align-items: flex-start; gap: 8px; font-size: var(--fs-3); cursor: pointer; }
 .sharelink input[type=checkbox] { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--foreground); flex: none; }
-.sharelink .why { display: block; font-size: 12px; color: var(--muted-foreground); }
+.sharelink .why { display: block; font-size: var(--fs-2); color: var(--muted-foreground); }
 .sharelink #nameshow b { color: var(--foreground); font-weight: 600; }
 .sharelink #nameshow .linkbtn { margin: 0; }
-.sharelink .namerow { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted-foreground); padding-left: 25px; }
-#myname { flex: 1; min-width: 0; max-width: 220px; font: 500 14px var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); }
-.notice { margin: 12px 0 0; padding: 8px 10px; border: 1.5px solid var(--foreground); background: var(--mid); font-size: 13.5px; }
+.sharelink .namerow { display: flex; align-items: center; gap: 8px; font-size: var(--fs-3); color: var(--muted-foreground); padding-left: 25px; }
+#myname { flex: 1; min-width: 0; max-width: 220px; font: 500 var(--fs-3) var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); }
+.notice { margin: 12px 0 0; padding: 8px 10px; border: 1.5px solid var(--foreground); background: var(--mid); font-size: var(--fs-3); }
 @media (prefers-reduced-motion: reduce) { .ov .tgt .pulse { animation: none; opacity: 0; } }
 
 #lb { width: min(560px, calc(100vw - 32px)); max-height: 86vh; padding: 0; overflow: auto; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
 #lb::backdrop { background: rgba(19, 17, 15, .45); }
 #lb .tabs { display: flex; gap: 8px; }
-#lb .tabs button { flex: 1; min-height: 38px; background: var(--card); border: 2px solid var(--foreground); border-radius: 0; font: 700 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); }
+#lb .tabs button { flex: 1; min-height: 38px; background: var(--card); border: 2px solid var(--foreground); border-radius: 0; font: 700 var(--fs-2) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); }
 #lb .tabs button[aria-pressed="true"] { background: var(--accent-neon); }
 ol.rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: 14px; }
+ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: var(--fs-3); }
 ol.rank li.me { border-color: var(--foreground); background: var(--accent-neon); font-weight: 700; }
 ol.rank li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ol.rank li .t { font-family: var(--mono); }
-#lb .optin { display: grid; gap: 10px; padding: 12px; border: 2px solid var(--foreground); background: var(--mid); font-size: 13.5px; }
+#lb .optin { display: grid; gap: 10px; padding: 12px; border: 2px solid var(--foreground); background: var(--mid); font-size: var(--fs-3); }
 #lb .optin label.tick { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
-#lb .optin .why { display: block; font-size: 12px; color: var(--muted-foreground); }
-#lb #lbname { font: 500 14px var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; max-width: 260px; }
+#lb .optin .why { display: block; font-size: var(--fs-2); color: var(--muted-foreground); }
+#lb #lbname { font: 500 var(--fs-3) var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; max-width: 260px; }
 #lb .row2 { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 #who { width: min(440px, calc(100vw - 32px)); padding: 0; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
 #who::backdrop { background: rgba(19, 17, 15, .6); }
-#who .why { font-size: 12px; color: var(--muted-foreground); margin: 0; }
-#who #whoname { font: 500 16px var(--body); padding: 9px 11px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; box-sizing: border-box; }
+#who .why { font-size: var(--fs-2); color: var(--muted-foreground); margin: 0; }
+#who #whoname { font: 500 var(--fs-4) var(--body); padding: 9px 11px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; box-sizing: border-box; }
 #endlb { margin: 14px 0 6px; padding: 14px 14px 12px; border: 3px solid var(--foreground); background: var(--card); box-shadow: 5px 5px 0 var(--foreground); display: grid; gap: 10px; }
-#endlb .endtitle { margin: 0; font: 800 22px/1.1 var(--body); letter-spacing: -.02em; }
-#endlb .endrank { margin: 0; font: 700 15px var(--mono); }
-#endlb ol.rank li { font-size: 15px; padding: 7px 9px; }
+#endlb .endtitle { margin: 0; font: 800 var(--fs-6)/1.1 var(--body); letter-spacing: -.02em; }
+#endlb .endrank { margin: 0; font: 700 var(--fs-4) var(--mono); }
+#endlb ol.rank li { font-size: var(--fs-4); padding: 7px 9px; }
+.ov .link.good { stroke: var(--good); stroke-width: 2; }
+.ov .link.mid { stroke: var(--mid); stroke-width: 2; }
+.ov .link.bad { stroke: var(--bad); stroke-width: 2; }
+.ov .dist.good { stroke: var(--good); stroke-width: 6px; }
+.ov .dist.mid { stroke: var(--mid); stroke-width: 6px; }
+.ov .dist.bad { stroke: var(--bad); stroke-width: 6px; fill: var(--card); }
+ol.rank li[data-pid] { cursor: pointer; }
+ol.rank li[data-pid]:hover, ol.rank li[data-pid]:focus-visible { border-color: var(--foreground); background: var(--accent-neon); outline: none; }
+ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: var(--muted-foreground); }
+#lbDetail { display: grid; gap: 10px; }
+#lbDetail h3, #lbDetail p { margin: 0; }
+ol.gl { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ol.gl li { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1.5px solid var(--border); background: var(--card); font-size: var(--fs-3); }
+ol.gl li .gt small { display: block; color: var(--muted-foreground); font-size: var(--fs-2); }
+ol.gl li .gms { font: 500 var(--fs-2) var(--mono); color: var(--muted-foreground); }
 </style>
 </head>
 <body>
@@ -503,6 +519,12 @@ ol.rank li .t { font-family: var(--mono); }
       <p class="hint" id="lbMsg"></p>
     </div>
     <div class="tabs"><button type="button" id="lbTabDay" aria-pressed="true">Σήμερα</button><button type="button" id="lbTabAll" aria-pressed="false">Όλων των εποχών</button></div>
+    <div id="lbDetail" hidden>
+      <button type="button" class="linkbtn" id="lbBack">← Πίσω στην κατάταξη</button>
+      <h3 class="endtitle" id="lbDName"></h3>
+      <p class="endrank" id="lbDMeta"></p>
+      <ol class="gl" id="lbDRounds"></ol>
+    </div>
     <ol class="rank" id="lbList"><li><span></span><span>Φόρτωση…</span><span></span></li></ol>
     <p class="note" id="lbNote"></p>
   </div>
@@ -710,16 +732,18 @@ function loadDay(key, animate) {
   // a past day not finished on its own day is played from the archive: it doesn't count in the statistics
   if (!PRACTICE && key !== todayKey() && S.phase !== 'done') S.arch = true;
   view = null;
+  if (S.phase === 'play' && !S.rs) roundStart();
   clearInput();
   renderAll(); focusView(animate);
   if (!S.arch || S.guesses.length) save();  // an archive day is saved once a round is played
   if (S.phase === 'play' && finePointer) inp.focus({ preventScroll: true });
 }
-function makeGuess(p) {
+function roundStart() { S.rs = Date.now(); S.t0 = S.t0 || S.rs; S.rk = 0; S.rm = 0; }
+function makeGuess(p, via) {
   const t = target(S.round);
   const exact = p.qid === t.qid;
   const d = exact ? 0 : km(p, t);
-  S.guesses.push({ q: p.qid, d: Math.round(d * 100) / 100, pts: exact ? 1000 : points(d) });
+  S.guesses.push({ q: p.qid, d: Math.round(d * 100) / 100, pts: exact ? 1000 : points(d), ms: Date.now() - (S.rs || Date.now()), typed: inp.value.trim().slice(0, 60), k: S.rk || 0, m: S.rm || 0, via: via || 'enter' });
   S.phase = 'reveal';
   clearInput(); inp.blur();
   renderAll(); focusView(true); save();
@@ -727,8 +751,9 @@ function makeGuess(p) {
 }
 function nextRound() {
   if (S.phase !== 'reveal') return;
-  if (S.round < 4) { S.round++; S.phase = 'play'; }
+  if (S.round < 4) { S.round++; S.phase = 'play'; roundStart(); }
   else {
+    S.t1 = Date.now();
     S.phase = 'done';
     if (!S.arch) {
       S.prevBest = store.get('best', 0);
@@ -1050,6 +1075,7 @@ function renderSugg() {
 function clearInput() { inp.value = ''; sugg = []; act = -1; renderSugg(); setMsg(''); }
 function setMsg(t, err) { msg.textContent = t || HINT; msg.classList.toggle('err', !!err); }
 inp.addEventListener('input', () => {
+  if (S && S.phase === 'play') S.rk = (S.rk || 0) + 1;
   sugg = search(inp.value).map(r => r[1]);
   act = sugg.length ? 0 : -1;
   renderSugg(); setMsg('');
@@ -1065,7 +1091,7 @@ inp.addEventListener('blur', () => { hideT = setTimeout(() => { list.hidden = tr
 list.addEventListener('mousedown', e => e.preventDefault());
 list.addEventListener('click', e => {
   const li = e.target.closest('li[data-k]');
-  if (li && S.phase === 'play') makeGuess(sugg[+li.dataset.k]);
+  if (li && S.phase === 'play') makeGuess(sugg[+li.dataset.k], 'click');
 });
 $('#play').addEventListener('submit', e => {
   e.preventDefault();
@@ -1073,7 +1099,8 @@ $('#play').addEventListener('submit', e => {
   const text = inp.value.trim();
   let p = act >= 0 ? sugg[act] : null;
   if (!p && text) { const r = search(text, 1)[0]; if (r && r[0] <= 1) p = r[1]; }
-  if (p) return makeGuess(p);
+  if (p) return makeGuess(p, 'enter');
+  S.rm = (S.rm || 0) + 1;
   setMsg(text ? `Δεν βρήκα «${text}». Ξαναδοκίμασε.` : 'Γράψε πρώτα το όνομα μιας πόλης ή ενός χωριού.', true);
   inp.focus();
 });
@@ -1202,7 +1229,7 @@ function drawScale() {
 }
 
 const mk = (p, inner, cls) => `<g class="${cls}" data-x="${p.x}" data-y="${p.y}"${p.qid ? ` data-q="${p.qid}"` : ''}>${inner}</g>`;
-const ln = (a, b) => `<line class="link" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"/>`;
+const ln = (a, b, pts) => `<line class="link ${tone(pts)}" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"/>`;
 function renderMarks() {
   let h = '';
   if (S.phase === 'play') {
@@ -1211,8 +1238,8 @@ function renderMarks() {
     const k = shown(), t = target(k), g = S.guesses[k], gp = BYQ.get(g.q);
     if (g.q !== t.qid) {
       const above = gp.y < t.y;
-      h += ln(t, gp);
-      h += mk({ x: (t.x + gp.x) / 2, y: (t.y + gp.y) / 2 }, `<text class="dist" dy="-7">${fmtKm(g.d)}</text>`, 'mid');
+      h += ln(t, gp, g.pts);
+      h += mk({ x: (t.x + gp.x) / 2, y: (t.y + gp.y) / 2 }, `<text class="dist ${tone(g.pts)}" dy="-7">${fmtKm(g.d)}</text>`, 'mid');
       h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss');
       h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="${above ? 23 : -14}">${esc(t.name)}</text>`, 'tgt');
     } else {
@@ -1221,7 +1248,7 @@ function renderMarks() {
   } else {
     if (OPT.ans) S.guesses.forEach((g, k) => {  // the player's answers, unless switched off on the map
       const t = target(k), gp = BYQ.get(g.q);
-      if (g.q !== t.qid) h += ln(t, gp) + mk(gp, '<circle r="4"/>', 'gss sm');
+      if (g.q !== t.qid) h += ln(t, gp, g.pts) + mk(gp, '<circle r="4"/>', 'gss sm');
     });
     S.targets.forEach((q, k) => { h += mk(BYQ.get(q), `<circle r="10"/><text>${k + 1}</text>`, 'num'); });
   }
@@ -1703,7 +1730,8 @@ async function submitScoreRaw() {
   const name = (store.get('name', '') || '').trim();
   if (!name || S.lbSent) return;
   try {
-    await rpc('submit_score', { p_cookie: getPid(true), p_fp: await fingerprint(), p_name: name, p_day: S.day, p_rounds: S.guesses.map(g => ({ q: g.q, d: g.d, pts: g.pts })) });
+    await rpc('submit_score', { p_cookie: getPid(true), p_fp: await fingerprint(), p_name: name, p_day: S.day, p_rounds: S.guesses.map((g, i) => ({ q: g.q, t: S.targets[i], d: g.d, pts: g.pts, ms: g.ms ?? null, typed: g.typed ?? null, k: g.k ?? null, m: g.m ?? null, via: g.via ?? null })),
+      p_meta: { v: SAVE_V, targets: S.targets, started: S.t0 ?? null, finished: S.t1 ?? null, duration_ms: S.t0 && S.t1 ? S.t1 - S.t0 : null, info: deviceInfo(), page: location.pathname, ref: (document.referrer || '').slice(0, 200) } });
     S.lbSent = true; save();
   } catch (e) { console.warn('leaderboard submit failed', e); }
 }
@@ -1719,17 +1747,44 @@ async function renderEndLb() {
   const me = lbData.me && lbData.me.today_rank, n = lbData.players_today;
   $('#endrank').textContent = me ? `Είσαι #${me} από ${n} παίκτες σήμερα` : `Παίκτες σήμερα: ${n}`;
   $('#endList').innerHTML = lbData.day.length
-    ? lbData.day.map((r, i) => `<li${r.me ? ' class="me"' : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}</span><span class="t">${nf.format(r.total)}</span></li>`).join('')
+    ? lbData.day.map((r, i) => rankRow(r, i, todayKey())).join('')
     : '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>';
   if (!$('#done').hidden) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 let lbTab = 'day', lbData = null;
+const fmtDur = ms => { const t = Math.round(ms / 1000); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
+const rankRow = (r, i, day) => `<li${r.me ? ' class="me"' : ''}${r.pid ? ` data-pid="${r.pid}" data-day="${day}" tabindex="0" role="button" title="Δες τις επιλογές"` : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}${r.duration_ms ? `<span class="dur">${fmtDur(r.duration_ms)}</span>` : ''}</span><span class="t">${nf.format(r.total)}</span></li>`;
+const lbDetailMode = on => { for (const sel of ['#lbOptin', '#lb .tabs', '#lbList', '#lbNote']) $(sel).hidden = on; $('#lbDetail').hidden = !on; };
+async function openGame(pid, day) {
+  const d = $('#lb');
+  if (!d.open) { if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', ''); }
+  lbDetailMode(true);
+  $('#lbDName').textContent = ''; $('#lbDMeta').textContent = 'Φόρτωση…'; $('#lbDRounds').innerHTML = '';
+  let g;
+  try { g = await rpc('get_game', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_player: pid, p_day: day || null }); }
+  catch (e) { $('#lbDMeta').textContent = 'Δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.'; return; }
+  if (!g.found) { $('#lbDMeta').textContent = 'Δεν βρέθηκε παιχνίδι.'; return; }
+  if (g.locked) { $('#lbDName').textContent = '🔒'; $('#lbDMeta').textContent = 'Τελείωσε πρώτα το σημερινό παιχνίδι για να δεις τις επιλογές των άλλων.'; return; }
+  $('#lbDName').textContent = g.name;
+  $('#lbDMeta').textContent = `#${dayNum(g.day)} · ${nf.format(g.total)} βαθμοί` + (g.duration_ms ? ` · ${fmtDur(g.duration_ms)} συνολικά` : '');
+  $('#lbDRounds').innerHTML = (g.rounds || []).map(r => {
+    const gp = BYQ.get(r.q), tp = r.t ? BYQ.get(r.t) : null;
+    const typed = r.typed && gp && r.typed.toLowerCase() !== gp.name.toLowerCase() ? ` · έγραψε «${esc(r.typed)}»` : '';
+    return `<li><span class="pip ${tone(r.pts)}">${r.pts}</span><span class="gt"><b>${esc(tp ? tp.name : '?')}</b><small>Απάντησε ${esc(gp ? gp.name : '?')} · ${fmtKm(r.d)}${typed}</small></span><span class="gms">${r.ms != null ? (r.ms / 1000).toFixed(1) + '″' : ''}</span></li>`;
+  }).join('');
+}
+for (const el of [$('#lbList'), $('#endList')]) {
+  el.addEventListener('click', e => { const li = e.target.closest('li[data-pid]'); if (li) openGame(li.dataset.pid, li.dataset.day); });
+  el.addEventListener('keydown', e => { const li = e.target.closest('li[data-pid]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openGame(li.dataset.pid, li.dataset.day); } });
+}
+$('#lbBack').addEventListener('click', () => { lbDetailMode(false); if (!lbData) lbLoad(); });
+
 function lbRender() {
   $('#lbTabDay').setAttribute('aria-pressed', lbTab === 'day'); $('#lbTabAll').setAttribute('aria-pressed', lbTab === 'alltime');
   const rows = lbData ? lbData[lbTab] : null;
   $('#lbList').innerHTML = !rows ? '<li><span></span><span>Φόρτωση…</span><span></span></li>'
     : !rows.length ? '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>'
-    : rows.map((r, i) => `<li${r.me ? ' class="me"' : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}</span><span class="t">${nf.format(r.total)}</span></li>`).join('');
+    : rows.map((r, i) => rankRow(r, i, lbTab === 'day' ? todayKey() : '')).join('');
   $('#lbNote').textContent = lbData ? `Παίκτες σήμερα: ${lbData.players_today}` + (lbData.me && lbData.me.games ? ` · Το καλύτερό σου: ${nf.format(lbData.me.best)}` : '') : '';
 }
 async function lbLoad() {
@@ -1744,6 +1799,7 @@ function lbOptinRender() {
   $('#lbDelRow').hidden = !on;
 }
 function openLb() {
+  lbDetailMode(false);
   lbOptinRender(); $('#lbMsg').textContent = ''; lbData = null; lbRender(); lbLoad();
   const d = $('#lb');
   if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
