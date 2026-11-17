@@ -682,8 +682,8 @@ function dailyTargets(key) {
    SAVE_V is the save format. Raising it forgets every saved game once (also the
    once-a-day lock), e.g. after the rules change. */
 const SAVE_V = 2;
-// practice.html: five random places on every load, nothing saved, so the daily game is never touched
-const PRACTICE = /*__PRACTICE__*/false;
+// index.html?practice (practice.html redirects here): five random places on every load, nothing saved, so the daily game is never touched
+const PRACTICE = new URLSearchParams(location.search).has('practice');
 function practiceTargets() {
   const chosen = [];
   for (const p of seededShuffle(POOL.concat(LATE_JOIN.filter(([q]) => BYQ.has(q)).map(([q]) => BYQ.get(q))), Math.random().toString(36).slice(2))) {
