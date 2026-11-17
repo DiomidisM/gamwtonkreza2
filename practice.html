@@ -350,11 +350,11 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 #lb .tabs { display: flex; gap: 8px; }
 #lb .tabs button { flex: 1; min-height: 38px; background: var(--card); border: 2px solid var(--foreground); border-radius: 0; font: 700 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); }
 #lb .tabs button[aria-pressed="true"] { background: var(--accent-neon); }
-#lb ol.rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-#lb ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: 14px; }
-#lb ol.rank li.me { border-color: var(--foreground); background: var(--accent-neon); font-weight: 700; }
-#lb ol.rank li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#lb ol.rank li .t { font-family: var(--mono); }
+ol.rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: 14px; }
+ol.rank li.me { border-color: var(--foreground); background: var(--accent-neon); font-weight: 700; }
+ol.rank li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ol.rank li .t { font-family: var(--mono); }
 #lb .optin { display: grid; gap: 10px; padding: 12px; border: 2px solid var(--foreground); background: var(--mid); font-size: 13.5px; }
 #lb .optin label.tick { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
 #lb .optin .why { display: block; font-size: 12px; color: var(--muted-foreground); }
@@ -364,6 +364,10 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 #who::backdrop { background: rgba(19, 17, 15, .6); }
 #who .why { font-size: 12px; color: var(--muted-foreground); margin: 0; }
 #who #whoname { font: 500 16px var(--body); padding: 9px 11px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; box-sizing: border-box; }
+#endlb { margin: 14px 0 6px; padding: 14px 14px 12px; border: 3px solid var(--foreground); background: var(--card); box-shadow: 5px 5px 0 var(--foreground); display: grid; gap: 10px; }
+#endlb .endtitle { margin: 0; font: 800 22px/1.1 var(--body); letter-spacing: -.02em; }
+#endlb .endrank { margin: 0; font: 700 15px var(--mono); }
+#endlb ol.rank li { font-size: 15px; padding: 7px 9px; }
 </style>
 </head>
 <body>
@@ -419,6 +423,7 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
           <div><dt>Μέση απόσταση</dt><dd id="davg"></dd></div>
           <div><dt>Πιο μακριά</dt><dd id="dfar"></dd></div>
         </dl>
+        <div id="endlb" hidden><h3 class="endtitle">🏆 Κατάταξη σήμερα</h3><p class="endrank" id="endrank"></p><ol class="rank" id="endList"></ol></div>
         <p class="best" id="dbest"></p>
         <div class="actions">
           <div class="sharecol">
@@ -431,7 +436,7 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
         <div class="sharelink" id="sharelink">
           <label class="tick"><input type="checkbox" id="shareAns"><span>Μοιράσου τις ακριβείς απαντήσεις σου<span class="why">Η αντιγραφή βάζει τότε έναν σύνδεσμο που ανοίγει αυτή την οθόνη, για όποιον έχει ήδη παίξει τη μέρα.</span></span></label>
           <div class="namerow" id="namerow" hidden><label for="myname">Το όνομά σου:</label><input id="myname" type="text" maxlength="24" autocomplete="nickname" placeholder="π.χ. Κρέζας"></div>
-          <div class="namerow" id="nameshow" hidden><span>ως <b id="nameval"></b> ·</span><button type="button" class="linkbtn" id="namechg">αλλαγή</button></div>
+          <div class="namerow" id="nameshow" hidden><span>ως <b id="nameval"></b> ·</span></div>
         </div>
         <div class="actions" id="friendwrap" hidden><button type="button" class="primary" id="friend"></button></div>
         <p class="hint" id="sharemsg" style="margin-top:10px"></p>
@@ -494,7 +499,6 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
     <div class="dlg-head"><h2 id="lbTitle">Κατάταξη</h2><button type="button" class="dlg-close" id="lbClose" aria-label="Κλείσιμο"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="optin" id="lbOptin">
       <label class="tick"><input type="checkbox" id="lbOn"><span>Συμμετέχω στην κατάταξη<span class="why">Όταν τελειώνεις το σημερινό παιχνίδι, το σκορ σου στέλνεται αυτόματα μαζί με το όνομά σου. Για να σε αναγνωρίζει ο ίδιος παίκτης την επόμενη μέρα, αποθηκεύεται ένα cookie (gk_pid) και ένας κατακερματισμένος (SHA-256) αποτυπωτής της συσκευής σου. Δεν στέλνεται IP ή email. Αν δεν το τσεκάρεις, δεν στέλνεται τίποτα.</span></span></label>
-      <div class="row2" id="lbNameRow" hidden><label for="lbname">Όνομα:</label><input id="lbname" type="text" maxlength="24" autocomplete="nickname" placeholder="π.χ. Κρέζας"><button type="button" class="primary" id="lbSave">Αποθήκευση</button></div>
       <div class="row2" id="lbDelRow" hidden><button type="button" class="linkbtn" id="lbDel">Διαγραφή όλων των δεδομένων μου από την κατάταξη</button></div>
       <p class="hint" id="lbMsg"></p>
     </div>
@@ -1126,7 +1130,6 @@ function renderName(editing) {
 const nameDone = () => { if (store.get('name', '').trim()) renderName(false); };
 $('#myname').addEventListener('blur', nameDone);
 $('#myname').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nameDone(); $('#share').focus({ preventScroll: true }); } });
-$('#namechg').addEventListener('click', () => { renderName(true); $('#myname').focus(); $('#myname').select(); });
 $('#shareAns').addEventListener('change', e => {
   store.set('shareAns', e.target.checked);
   renderName(false);
@@ -1316,7 +1319,7 @@ let XI = [], HITS = [];  // what to show after the game, in order of priority
 function renderExtras() {
   const on = !!S && S.phase === 'done';
   $('#mapopts').hidden = !on;
-  const open = OPT.open ?? PW >= 600;  // open on computers, folded on phones until tapped
+  const open = OPT.open ?? false;  // folded by default; the player can open it
   $('#mapopts').classList.toggle('closed', !open);
   $('#moHead').setAttribute('aria-expanded', String(open));
   for (const b of $('#optAns').children) b.setAttribute('aria-pressed', String((b.dataset.v === '1') === OPT.ans));
@@ -1695,7 +1698,7 @@ async function rpc(fn, body) {
   return r.json();
 }
 // sends today's finished game once. Safe to call any time; does nothing unless every condition holds.
-async function submitScore() {
+async function submitScoreRaw() {
   if (PRACTICE || !S || S.shared || S.arch || S.phase !== 'done' || S.day !== todayKey() || !lbOn()) return;
   const name = (store.get('name', '') || '').trim();
   if (!name || S.lbSent) return;
@@ -1703,6 +1706,22 @@ async function submitScore() {
     await rpc('submit_score', { p_cookie: getPid(true), p_fp: await fingerprint(), p_name: name, p_day: S.day, p_rounds: S.guesses.map(g => ({ q: g.q, d: g.d, pts: g.pts })) });
     S.lbSent = true; save();
   } catch (e) { console.warn('leaderboard submit failed', e); }
+}
+async function submitScore() { await submitScoreRaw(); renderEndLb(); }
+// the big leaderboard under the final score (daily game only)
+async function renderEndLb() {
+  const box = $('#endlb');
+  const show = !PRACTICE && S && S.phase === 'done' && !S.shared && !S.arch;
+  box.hidden = !show;
+  if (!show) return;
+  try { lbData = await rpc('get_leaderboard', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_day: todayKey() }); }
+  catch (e) { $('#endrank').textContent = 'Η κατάταξη δεν φορτώνει τώρα.'; return; }
+  const me = lbData.me && lbData.me.today_rank, n = lbData.players_today;
+  $('#endrank').textContent = me ? `Είσαι #${me} από ${n} παίκτες σήμερα` : `Παίκτες σήμερα: ${n}`;
+  $('#endList').innerHTML = lbData.day.length
+    ? lbData.day.map((r, i) => `<li${r.me ? ' class="me"' : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}</span><span class="t">${nf.format(r.total)}</span></li>`).join('')
+    : '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>';
+  if (!$('#done').hidden) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 let lbTab = 'day', lbData = null;
 function lbRender() {
@@ -1722,9 +1741,7 @@ function lbOptinRender() {
   const on = lbOn();
   $('#lbOn').checked = on;
   $('#lbOn').closest('label').hidden = true;
-  $('#lbNameRow').hidden = !on;
   $('#lbDelRow').hidden = !on;
-  $('#lbname').value = store.get('name', '') || '';
 }
 function openLb() {
   lbOptinRender(); $('#lbMsg').textContent = ''; lbData = null; lbRender(); lbLoad();
@@ -1736,14 +1753,6 @@ $('#lbClose').addEventListener('click', () => { const d = $('#lb'); if (d.close)
 $('#lb').addEventListener('click', e => { if (e.target.id === 'lb' && e.target.close) e.target.close(); });
 $('#lbTabDay').addEventListener('click', () => { lbTab = 'day'; lbRender(); });
 $('#lbTabAll').addEventListener('click', () => { lbTab = 'alltime'; lbRender(); });
-$('#lbOn').addEventListener('change', e => { lbSetOn(e.target.checked); lbOptinRender(); if (e.target.checked) $('#lbname').focus(); });
-$('#lbSave').addEventListener('click', async () => {
-  const nm = $('#lbname').value.replace(/\s+/g, ' ').trim().slice(0, 24);
-  if (!nm) { $('#lbMsg').textContent = 'Γράψε ένα όνομα.'; return; }
-  store.set('name', nm); if (PRACTICE) { $('#lbMsg').textContent = 'Το όνομα αποθηκεύεται από το κανονικό παιχνίδι.'; return; }
-  $('#lbMsg').textContent = 'Αποθηκεύτηκε.';
-  await submitScore(); lbLoad();
-});
 $('#lbDel').addEventListener('click', async () => {
   if (!confirm('Να διαγραφούν όλα τα σκορ και τα δεδομένα σου από την κατάταξη;')) return;
   try { await rpc('delete_me', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000' }); } catch { $('#lbMsg').textContent = 'Η διαγραφή απέτυχε. Δοκίμασε ξανά.'; return; }
