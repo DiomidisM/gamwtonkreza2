@@ -202,3 +202,12 @@ begin
 end $$;
 revoke all on function public.get_game(uuid, uuid, date) from public;
 grant execute on function public.get_game(uuid, uuid, date) to anon, authenticated;
+
+-- Map and place data for the game (public read, written only with the service role / SQL editor).
+-- Fill it from assets/map-data.json: one row per top-level key (v, g, n, r, p, s, js, b, j, k, m, t, gd).
+create table if not exists map_data (key text primary key, data jsonb not null, updated_at timestamptz not null default now());
+alter table map_data enable row level security;
+drop policy if exists "map_data public read" on map_data;
+create policy "map_data public read" on map_data for select to anon, authenticated using (true);
+revoke all on map_data from anon, authenticated;
+grant select on map_data to anon, authenticated;
