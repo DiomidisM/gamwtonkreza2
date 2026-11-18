@@ -211,3 +211,94 @@ drop policy if exists "map_data public read" on map_data;
 create policy "map_data public read" on map_data for select to anon, authenticated using (true);
 revoke all on map_data from anon, authenticated;
 grant select on map_data to anon, authenticated;
+
+
+-- get_day: leaderboard of one day. Per-round points only if the viewer has played that same day.
+create or replace function public.get_day(p_cookie uuid, p_day date)
+returns json language plpgsql security definer set search_path to 'public' as $$
+declare
+  v_me uuid;
+  v_played boolean;
+  v_out json;
+begin
+  select player_id into v_me from devices where cookie_id = p_cookie;
+  select exists (select 1 from scores where player_id = v_me and day = p_day) into v_played;
+  select json_build_object(
+    'day', p_day,
+    'me_played', v_played,
+    'players', (select count(*) from scores where day = p_day),
+    'rows', (select coalesce(json_agg(t order by t.rank, t.created_at), '[]'::json) from (
+        select pl.id as pid, pl.display_name as name, s.total, s.late, s.duration_ms, s.created_at,
+               rank() over (order by s.total desc) as rank,
+               (s.player_id = v_me) as me,
+               case when v_played or s.player_id = v_me
+                    then (select json_agg((r->>'pts')::int order by o) from jsonb_array_elements(s.rounds) with ordinality as x(r, o))
+                    else null end as pts
+        from scores s join players pl on pl.id = s.player_id
+        where s.day = p_day
+        order by s.total desc, s.created_at limit 60) t)
+  ) into v_out;
+  return v_out;
+end $$;
+revoke all on function public.get_day(uuid, date) from public;
+grant execute on function public.get_day(uuid, date) to anon, authenticated;
+
+-- get_history: archive (per day), group stats (per player, with days) and the viewer's own stats.
+create or replace function public.get_history(p_cookie uuid)
+returns json language plpgsql security definer set search_path to 'public' as $$
+declare
+  v_me uuid;
+  v_today date := (now() at time zone 'Europe/Athens')::date;
+  v_out json;
+begin
+  select player_id into v_me from devices where cookie_id = p_cookie;
+  with top as (
+    select s.*, max(s.total) over (partition by s.day) as best from scores s
+  ),
+  days as (
+    select d::date as day from generate_series(date '2026-11-10', v_today, interval '1 day') d
+  ),
+  wins as (
+    select player_id, count(*) as wins from top where total = best and not late group by player_id
+  ),
+  agg as (
+    select player_id, count(*) as games, round(avg(total))::int as avg, max(total) as best, sum(total)::int as sum, max(day) as last_day
+    from scores group by player_id
+  )
+  select json_build_object(
+    'today', v_today,
+    'days', (select json_agg(json_build_object(
+        'day', dd.day,
+        'players', (select count(*) from scores s where s.day = dd.day),
+        'top', (select json_build_object('pid', pl.id, 'name', pl.display_name, 'total', s.total)
+                from scores s join players pl on pl.id = s.player_id
+                where s.day = dd.day order by s.total desc, s.created_at limit 1),
+        'me', (select json_build_object('total', s.total, 'late', s.late,
+                  'pts', (select json_agg((r->>'pts')::int order by o) from jsonb_array_elements(s.rounds) with ordinality as x(r, o)))
+               from scores s where s.player_id = v_me and s.day = dd.day)
+      ) order by dd.day desc) from days dd),
+    'players', (select coalesce(json_agg(json_build_object(
+        'pid', pl.id, 'name', pl.display_name, 'games', a.games, 'avg', a.avg, 'best', a.best, 'sum', a.sum,
+        'last_day', a.last_day, 'wins', coalesce(w.wins, 0), 'me', (pl.id = v_me),
+        'days', (select json_agg(json_build_object('day', s.day, 'total', s.total, 'late', s.late) order by s.day desc) from scores s where s.player_id = pl.id)
+      ) order by a.avg desc), '[]'::json)
+      from agg a join players pl on pl.id = a.player_id left join wins w on w.player_id = a.player_id),
+    'me', (select case when v_me is null or not exists (select 1 from scores where player_id = v_me) then null else json_build_object(
+        'games', (select count(*) from scores where player_id = v_me),
+        'avg', (select round(avg(total))::int from scores where player_id = v_me),
+        'best', (select max(total) from scores where player_id = v_me),
+        'perfect', (select count(*) from scores s, jsonb_array_elements(s.rounds) r where s.player_id = v_me and (r->>'pts')::int = 1000),
+        'rounds', (select count(*) from scores s, jsonb_array_elements(s.rounds) r where s.player_id = v_me),
+        'green', (select count(*) from scores s, jsonb_array_elements(s.rounds) r where s.player_id = v_me and (r->>'pts')::int >= 800),
+        'closest', (select json_build_object('km', (r->>'d')::numeric, 'q', (r->>'q')::int, 'day', s.day)
+                    from scores s, jsonb_array_elements(s.rounds) r
+                    where s.player_id = v_me and (r->>'d') is not null and (r->>'d')::numeric > 0
+                    order by (r->>'d')::numeric limit 1),
+        'max_streak', (select coalesce(max(c), 0) from (select count(*) c from (select day - (row_number() over (order by day))::int as g from scores where player_id = v_me and not late) x group by g) y),
+        'streak', (select coalesce((select c from (select count(*) c, max(day) last from (select day, day - (row_number() over (order by day))::int as g from scores where player_id = v_me and not late) x group by g) y where last >= v_today - 1 order by last desc limit 1), 0))
+      ) end)
+  ) into v_out;
+  return v_out;
+end $$;
+revoke all on function public.get_history(uuid) from public;
+grant execute on function public.get_history(uuid) to anon, authenticated;

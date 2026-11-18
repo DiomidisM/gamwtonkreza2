@@ -61,6 +61,72 @@ a:hover { text-decoration-style: solid; }
   font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; line-height: normal; animation: bandIn .5s; }
 @keyframes bandIn { from { opacity: 0; } to { opacity: 1; } }
 
+
+/* ---------- views: day page, days, group ---------- */
+.brand { position: relative; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 10px; }
+.brand h1 { flex: 1 1 auto; min-width: 0; }
+.whomenu { position: relative; flex: none; margin-top: 4px; order: 2; }
+.tabs3, .daybar { flex: 0 0 100%; order: 3; }
+.whomenu summary { list-style: none; cursor: pointer; padding: 4px 8px; border: 2px solid var(--foreground); background: var(--card); font: 600 var(--fs-1) var(--mono); letter-spacing: .06em; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.whomenu summary::-webkit-details-marker { display: none; }
+.whomenu[open] summary { background: var(--accent-neon); }
+.whomenu > div { position: absolute; right: 0; top: calc(100% + 4px); z-index: 20; display: grid; gap: 8px; padding: 10px 12px; background: var(--background); border: 2px solid var(--foreground); box-shadow: 4px 4px 0 var(--foreground); white-space: nowrap; }
+.whomenu .linkbtn { margin: 0; text-align: left; }
+.tabs3 { display: flex; margin-top: 12px; border: 2px solid var(--foreground); }
+.tabs3 button { flex: 1; min-height: 40px; background: var(--card); border: 0; border-right: 2px solid var(--foreground); font: 700 var(--fs-2) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); cursor: pointer; }
+.tabs3 button:last-child { border-right: 0; }
+.tabs3 button[aria-current="page"] { background: var(--accent-neon); }
+.tabs3 button.dot::after { content: " •"; color: var(--bad); }
+.daybar { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.daybar .date { flex: 1; text-align: center; }
+.daybar button { width: 36px; min-height: 36px; background: var(--card); border: 2px solid var(--foreground); font: 700 var(--fs-4) var(--mono); color: var(--foreground); cursor: pointer; }
+.daybar button:disabled { opacity: .3; cursor: default; }
+.app.v-days .tag, .app.v-days .status, .app.v-days #panel, .app.v-days #dayBoard, .app.v-days .log, .app.v-days .daybar,
+.app.v-group .tag, .app.v-group .status, .app.v-group #panel, .app.v-group #dayBoard, .app.v-group .log, .app.v-group .daybar { display: none; }
+.view { padding-block: 16px 28px; border-top: 2px solid var(--foreground); flex: 1; }
+.view h2 { margin: 0 0 10px; font: 800 var(--fs-5)/1.1 var(--body); letter-spacing: -.02em; }
+#unplayed { padding: 12px; border: 2px solid var(--foreground); background: var(--mid); display: grid; gap: 10px; }
+#unplayed p { margin: 0; }
+.board { padding-block: 16px 20px; border-top: 2px solid var(--foreground); }
+.board h3 { margin: 0 0 8px; font: 800 var(--fs-4)/1.2 var(--body); }
+.board ol.rank li { grid-template-columns: 28px minmax(0, 1fr) auto auto; align-items: center; cursor: pointer; }
+.board ol.rank li:hover { background: var(--muted); }
+.board ol.rank li.me { background: var(--accent-neon); cursor: default; }
+.board ol.rank li.me:hover { background: var(--accent-neon); }
+.board ol.rank li.viewing { border: 2px solid var(--foreground); background: var(--muted); box-shadow: inset 6px 0 0 var(--foreground); font-weight: 700; }
+.board ol.rank li.viewing .nm::after { content: " · το βλέπεις"; font: 500 var(--fs-1) var(--mono); color: var(--muted-foreground); }
+.board .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board .nm small, .days small, .grp small { color: var(--muted-foreground); font: 400 var(--fs-2) var(--mono); margin-left: 6px; }
+.bsq { display: inline-flex; gap: 2px; }
+.bsq i { width: 10px; height: 10px; border: 1.5px solid var(--foreground); background: var(--card); }
+.bsq i.good { background: var(--good); } .bsq i.mid { background: var(--mid); } .bsq i.bad { background: var(--bad); }
+.bsq.hide i { background: repeating-linear-gradient(45deg, var(--muted) 0 2px, var(--card) 2px 4px); }
+.board .t { font: 600 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; min-width: 3.4em; text-align: right; }
+.board .note { margin: 8px 0 0; font-size: var(--fs-2); color: var(--muted-foreground); }
+.cmpbar { margin: 0 0 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 8px 10px; margin-bottom: 8px; background: var(--foreground); color: var(--background); font: 600 var(--fs-2) var(--mono); }
+.cmpbar b { font-weight: 800; }
+.cmpbar .linkbtn { margin: 0 0 0 auto; color: var(--background); }
+.rounds.cmp li { grid-template-columns: 20px minmax(0, 1fr) auto auto; }
+.rounds .c { color: var(--muted-foreground); }
+.rounds small.cs { color: var(--foreground); }
+.ov .cgs rect { fill: #fff; stroke: var(--foreground); stroke-width: 2; }
+.ov .cgs .lab { font-weight: 500; }
+.ov .link.cmp { stroke: var(--foreground); stroke-width: 1.5; stroke-dasharray: 1 4; }
+.days .win { display: block; margin-top: 2px; color: var(--muted-foreground); font-size: var(--fs-2); }
+.grp { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.grp > li { border-bottom: 1px solid var(--border); }
+.grp > li.sep { padding: 10px 2px 4px; font: 500 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); border-bottom: 0; }
+.grp summary { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 2px; cursor: pointer; list-style: none; }
+.grp summary::-webkit-details-marker { display: none; }
+.grp li.me > details > summary { background: var(--accent-neon); }
+.grp .v { font: 700 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; }
+.grp .pdays { list-style: none; margin: 0 0 8px; padding: 0 0 0 34px; }
+.grp .pdays button { width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 6px 4px; background: none; border: 0; font: 500 var(--fs-3) var(--mono); text-align: left; cursor: pointer; }
+.grp .pdays button:hover { background: var(--accent-neon); }
+.sort { display: flex; gap: 6px; margin: 12px 0 8px; }
+.sort button { flex: 1; min-height: 34px; background: var(--card); border: 2px solid var(--foreground); font: 700 var(--fs-1) var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--foreground); cursor: pointer; }
+.sort button[aria-pressed="true"] { background: var(--accent-neon); }
+
 /* ---------- frame ---------- */
 .app { display: flex; }
 .chart { position: relative; overflow: hidden; background: var(--background); touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
@@ -85,7 +151,9 @@ a:hover { text-decoration-style: solid; }
   .top { order: 1; }
   .chart { order: 2; height: 62vh; height: min(62svh, 620px, calc(100vw + 40px)); min-height: 300px; border-block: 2px solid var(--foreground); }
   .panel { order: 3; }
-  .log { order: 4; }
+  .board { order: 4; }
+  .log { order: 5; }
+  .view { order: 3; }
   .pad { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 }
 
@@ -290,8 +358,6 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 .tinybtn:hover { border-color: var(--foreground); color: var(--foreground); background: var(--accent-neon); }
 .secondary { min-height: 48px; padding: 0 18px; background: transparent; color: var(--foreground); border: 2px solid var(--foreground); border-radius: 0; font: 700 var(--fs-3) var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .secondary:hover { background: var(--accent-neon); color: var(--dot-ring); }
-#stats, #arch { width: min(560px, calc(100vw - 32px)); max-height: 86vh; padding: 0; overflow: auto; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
-#stats::backdrop, #arch::backdrop { background: rgba(19, 17, 15, .45); }
 .dlg { padding: 20px 22px 24px; display: grid; gap: 16px; }
 .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--foreground); padding-bottom: 12px; }
 .dlg-head h2 { margin: 0; font: 800 var(--fs-6)/1.1 var(--body); letter-spacing: -.025em; }
@@ -340,11 +406,6 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 .notice { margin: 12px 0 0; padding: 8px 10px; border: 1.5px solid var(--foreground); background: var(--mid); font-size: var(--fs-3); }
 @media (prefers-reduced-motion: reduce) { .ov .tgt .pulse { animation: none; opacity: 0; } }
 
-#lb { width: min(560px, calc(100vw - 32px)); max-height: 86vh; padding: 0; overflow: auto; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
-#lb::backdrop { background: rgba(19, 17, 15, .45); }
-#lb .tabs { display: flex; gap: 8px; }
-#lb .tabs button { flex: 1; min-height: 38px; background: var(--card); border: 2px solid var(--foreground); border-radius: 0; font: 700 var(--fs-2) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--foreground); }
-#lb .tabs button[aria-pressed="true"] { background: var(--accent-neon); }
 ol.rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 ol.rank li { display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; padding: 6px 8px; border: 1.5px solid var(--border); background: var(--card); font-size: var(--fs-3); }
 ol.rank li.me { border-color: var(--foreground); background: var(--accent-neon); font-weight: 700; }
@@ -352,19 +413,10 @@ ol.rank li.viewing { border: 2px solid var(--foreground); background: var(--mute
 ol.rank li.viewing .n::after { content: " · το βλέπεις"; font: 500 var(--fs-1) var(--mono); color: var(--muted-foreground); }
 ol.rank li .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 ol.rank li .t { font-family: var(--mono); }
-#lb .optin { display: grid; gap: 10px; padding: 12px; border: 2px solid var(--foreground); background: var(--mid); font-size: var(--fs-3); }
-#lb .optin label.tick { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
-#lb .optin .why { display: block; font-size: var(--fs-2); color: var(--muted-foreground); }
-#lb #lbname { font: 500 var(--fs-3) var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; max-width: 260px; }
-#lb .row2 { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 #who { width: min(440px, calc(100vw - 32px)); padding: 0; background: var(--background); color: var(--foreground); border: 2px solid var(--foreground); box-shadow: 6px 6px 0 var(--foreground); }
 #who::backdrop { background: rgba(19, 17, 15, .6); }
 #who .why { font-size: var(--fs-2); color: var(--muted-foreground); margin: 0; }
 #who #whoname { font: 500 var(--fs-4) var(--body); padding: 9px 11px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); width: 100%; box-sizing: border-box; }
-#endlb { margin: 14px 0 6px; padding: 14px 14px 12px; border: 3px solid var(--foreground); background: var(--card); box-shadow: 5px 5px 0 var(--foreground); display: grid; gap: 10px; }
-#endlb .endtitle { margin: 0; font: 800 var(--fs-6)/1.1 var(--body); letter-spacing: -.02em; }
-#endlb .endrank { margin: 0; font: 700 var(--fs-4) var(--mono); }
-#endlb ol.rank li { font-size: var(--fs-4); padding: 7px 9px; }
 .ov .link.good { stroke: var(--good); stroke-width: 2; }
 .ov .link.mid { stroke: var(--mid); stroke-width: 2; }
 .ov .link.bad { stroke: var(--bad); stroke-width: 2; }
@@ -380,7 +432,9 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
     <header class="top pad">
       <div class="brand">
         <h1><span class="hname">gamwtonkreza2</span> <span class="practag" id="archtag" hidden>Αρχείο</span></h1>
-        <div class="dateline"><p class="date" id="date"></p><span class="dlinks"><button type="button" class="linkbtn" id="statsBtn">Στατιστικά</button><button type="button" class="linkbtn" id="archBtn">Αρχείο</button><button type="button" class="linkbtn" id="lbBtn">Κατάταξη</button><button type="button" class="linkbtn" id="logoutBtn">Αποσύνδεση</button></span></div>
+        <details class="whomenu" id="whomenu" hidden><summary id="whoChip"></summary><div><button type="button" class="linkbtn" id="logoutBtn">Αποσύνδεση</button><button type="button" class="linkbtn" id="delBtn">Διαγραφή των δεδομένων μου</button></div></details>
+        <nav class="tabs3" id="tabs3" aria-label="Προβολές"><button type="button" id="tabToday">Σήμερα</button><button type="button" id="tabDays">Μέρες</button><button type="button" id="tabGroup">Παρέα</button></nav>
+        <div class="daybar" id="daybar"><button type="button" id="dayPrev" aria-label="Προηγούμενη μέρα">‹</button><p class="date" id="date"></p><button type="button" id="dayNext" aria-label="Επόμενη μέρα">›</button></div>
       </div>
       <p class="tag">Βρες την πόλη ή το χωριό που απεικονίζεται στο χάρτη, όσο πιο κοντά γίνεται κάθε φορά.</p>
       <div class="status">
@@ -392,6 +446,11 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
     </header>
 
     <section class="panel pad" id="panel" aria-live="polite">
+      <div id="unplayed" hidden>
+        <p class="eyebrow" style="margin:0">Δεν το έχεις παίξει</p>
+        <p id="upmsg"></p>
+        <div class="actions"><button type="button" class="primary" id="playNow"></button></div>
+      </div>
       <form id="play" autocomplete="off" novalidate>
         <p class="eyebrow" id="roundlbl">Γύρος 1/5</p>
         <label class="q" for="guess">Ποιο μέρος είναι στο πράσινο σημάδι;</label>
@@ -420,14 +479,11 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
       <div id="done" hidden>
         <p class="eyebrow" id="dlbl">Το σημερινό σου αποτέλεσμα</p>
         <div class="final"><span class="big" id="dtotal">0</span><small>/5000</small></div>
-        <div id="endlb" hidden><h3 class="endtitle">🏆 Κατάταξη σήμερα</h3><p class="endrank" id="endrank"></p><ol class="rank" id="endList"></ol></div>
         <div class="actions">
           <div class="sharecol">
             <button type="button" class="primary" id="share">Αντιγραφή αποτελέσματος</button>
             <button type="button" class="tinybtn" id="share2">(Είμαι η Μαριλένα και δεν ξέρω να κάνω copy)</button>
           </div>
-          <button type="button" class="primary" id="mine" hidden>Τα δικά μου αποτελέσματα</button>
-          <button type="button" class="secondary" id="statsBtn2">Στατιστικά</button>
         </div>
         <details class="more"><summary>Λεπτομέρειες και επιλογές</summary>
         <dl class="stats">
@@ -449,6 +505,26 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
           <button type="button" class="primary" id="today">Παίξε το σημερινό παιχνίδι</button>
         </div>
       </div>
+    </section>
+
+    <section class="board pad" id="dayBoard" hidden>
+      <h3 id="boardHead"></h3>
+      <div class="cmpbar" id="cmpbar" hidden></div>
+      <ol class="rank" id="boardList"></ol>
+      <p class="note" id="boardNote"></p>
+    </section>
+
+    <section class="view pad" id="viewDays" hidden>
+      <h2>Μέρες</h2>
+      <p class="note" id="daysHead" style="margin:0 0 8px"></p>
+      <ol class="days" id="daysList"></ol>
+    </section>
+
+    <section class="view pad" id="viewGroup" hidden>
+      <h2>Παρέα</h2>
+      <div id="grpMe"></div>
+      <div class="sort" id="grpSort" role="group" aria-label="Ταξινόμηση"><button type="button" data-s="avg" aria-pressed="true">Μέσος όρος</button><button type="button" data-s="wins" aria-pressed="false">Νίκες</button><button type="button" data-s="sum" aria-pressed="false">Σύνολο</button></div>
+      <ol class="grp" id="grpList"></ol>
     </section>
 
     <section class="log pad">
@@ -479,33 +555,6 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
     </div>
   </section>
 </div>
-<dialog id="stats" lang="el" aria-labelledby="statsTitle">
-  <div class="dlg">
-    <div class="dlg-head"><h2 id="statsTitle">Στατιστικά</h2><button type="button" class="dlg-close" id="statsClose" aria-label="Κλείσιμο"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <div id="statsBody"></div>
-    <p class="note">Τα στατιστικά μένουν σε αυτή τη συσκευή και σε αυτόν τον browser. Χάνονται αν σβήσεις τα δεδομένα του browser.</p>
-  </div>
-</dialog>
-<dialog id="arch" lang="el" aria-labelledby="archTitle">
-  <div class="dlg">
-    <div class="dlg-head"><h2 id="archTitle">Αρχείο</h2><button type="button" class="dlg-close" id="archClose" aria-label="Κλείσιμο"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <ol class="days" id="archBody"></ol>
-    <p class="note">Όποια μέρα δεν έπαιξες, μπορείς να την παίξεις τώρα. Τα παιχνίδια από το αρχείο δεν μετράνε στα στατιστικά, αλλά μπαίνουν στην κατάταξη της μέρας τους.</p>
-  </div>
-</dialog>
-<dialog id="lb" lang="el" aria-labelledby="lbTitle">
-  <div class="dlg">
-    <div class="dlg-head"><h2 id="lbTitle">Κατάταξη</h2><button type="button" class="dlg-close" id="lbClose" aria-label="Κλείσιμο"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <div class="optin" id="lbOptin">
-      <label class="tick"><input type="checkbox" id="lbOn"><span>Συμμετέχω στην κατάταξη<span class="why">Όταν τελειώνεις το σημερινό παιχνίδι, το σκορ σου στέλνεται αυτόματα μαζί με το όνομά σου. Για να σε αναγνωρίζει ο ίδιος παίκτης την επόμενη μέρα, αποθηκεύεται ένα cookie (gk_pid) και ένας κατακερματισμένος (SHA-256) αποτυπωτής της συσκευής σου. Δεν στέλνεται IP ή email. Αν δεν το τσεκάρεις, δεν στέλνεται τίποτα.</span></span></label>
-      <div class="row2" id="lbDelRow" hidden><button type="button" class="linkbtn" id="lbOut">Αποσύνδεση (νέος παίκτης)</button><button type="button" class="linkbtn" id="lbDel">Διαγραφή όλων των δεδομένων μου από την κατάταξη</button></div>
-      <p class="hint" id="lbMsg"></p>
-    </div>
-    <div class="tabs"><button type="button" id="lbTabDay" aria-pressed="true">Σήμερα</button><button type="button" id="lbTabAll" aria-pressed="false">Όλων των εποχών</button></div>
-    <ol class="rank" id="lbList"><li><span></span><span>Φόρτωση…</span><span></span></li></ol>
-    <p class="note" id="lbNote"></p>
-  </div>
-</dialog>
 <dialog id="who" lang="el" aria-labelledby="whoTitle">
   <form class="dlg" id="whoForm" method="dialog">
     <div class="dlg-head"><h2 id="whoTitle">Ποιος είσαι;</h2></div>
@@ -715,6 +764,9 @@ const store = {
 let S = null;
 // after the game: the round whose card is shown again (0-4), or null for the results. Not saved.
 let view = null;
+// the day page: the group's board for the open day, a friend's game laid next to yours, the history
+let BOARD = null, CMP = null, cmpPushed = false, pendingCmp = null, HIST = null, VIEW = 'day', grpSort = 'avg';
+const NIL = '00000000-0000-4000-8000-000000000000';
 // the round whose card is on show: the one just played, or the one picked after the game
 const shown = () => S.phase === 'reveal' ? S.round : S.phase === 'done' ? view : null;
 function validState(s) {
@@ -733,13 +785,15 @@ function loadDay(key, animate) {
   S = validState(saved) && saved.day === key ? saved : { v: SAVE_V, day: key, targets: PRACTICE ? practiceTargets() : dailyTargets(key), guesses: [], round: 0, phase: 'play' };
   // a past day not finished on its own day is played from the archive: it doesn't count in the statistics
   if (!PRACTICE && key !== todayKey() && S.phase !== 'done') S.arch = true;
-  view = null;
-  if (S.phase === 'play' && !S.rs) roundStart();
+  view = null; CMP = null; cmpPushed = false; BOARD = null;
+  // a past day not played yet is shown first (the board, the places), and played when the player says so
+  S.preview = !PRACTICE && key !== todayKey() && S.phase === 'play' && S.guesses.length === 0;
+  if (S.phase === 'play' && !S.rs && !S.preview) roundStart();
   clearInput();
   renderAll(); focusView(animate);
-  if (!S.arch || S.guesses.length) save();
-  if (S.phase === 'done') submitScore();  // an archive day finished earlier, before joining  // an archive day is saved once a round is played
-  if (S.phase === 'play' && finePointer) inp.focus({ preventScroll: true });
+  if (!S.preview && (!S.arch || S.guesses.length)) save();  // an archive day is saved once a round is played
+  if (S.phase === 'done') submitScore(); else loadBoard();  // a day finished earlier, before joining, is sent now
+  if (S.phase === 'play' && !S.preview && finePointer) inp.focus({ preventScroll: true });
 }
 function roundStart() { S.rs = Date.now(); S.t0 = S.t0 || S.rs; S.rk = 0; S.rm = 0; }
 function makeGuess(p, via) {
@@ -785,7 +839,9 @@ function renderAll() {
   }).join('');
   $('#total').textContent = nf.format(total());
 
-  $('#play').hidden = S.phase !== 'play';
+  $('#play').hidden = S.phase !== 'play' || !!S.preview;
+  $('#unplayed').hidden = !S.preview;
+  if (S.preview) { const n = dayNum(S.day); $('#upmsg').textContent = `Παίξε το #${n} τώρα. Μετράει στην κατάταξη της μέρας, με σημάδι «αρχείο».`; $('#playNow').textContent = `Παίξε το #${n} →`; }
   $('#reveal').hidden = sk == null;
   $('#done').hidden = S.phase !== 'done' || sk != null;
 
@@ -829,8 +885,6 @@ function renderAll() {
       : `Το ρεκόρ σου: ${nf.format(Math.max(store.get('best', 0), sum))}.`;
     $('#sharemsg').textContent = '';
     $('#sharetext').hidden = true;
-    $('#done .sharecol').hidden = !you;
-    $('#mine').hidden = you;
     tick();
   }
 
@@ -843,10 +897,17 @@ function renderAll() {
     const tk = target(k), gp = BYQ.get(g.q);
     const sub = g.q === tk.qid ? 'Bingo!' : `${S.shared ? 'έβαλε' : 'έβαλες'}: ${esc(gp.name)} (${esc(gp.reg)}) · ${fmtKm(g.d)}`;
     const pick = S.phase === 'done' ? ` class="pick${k === view ? ' sel' : ''}" data-k="${k}"` : '';
-    return `<li${pick}><span class="n">${k + 1}</span><span><b>${esc(tk.name)}</b> <span class="reg">${esc(tk.reg)}</span><small>${sub}</small></span><span class="p"><span class="tone ${tone(g.pts)}"></span>${g.pts}</span></li>`;
+    const c = S.phase === 'done' && CMP ? CMP.rounds[k] : null, cp = c ? BYQ.get(c.q) : null;
+    const csub = c ? `<small class="cs">${esc(CMP.name)}: ${c.q === tk.qid ? 'Bingo!' : `${esc(cp.name)} · ${fmtKm(c.d)}`}</small>` : '';
+    const ccol = c ? `<span class="p c"><span class="tone ${tone(c.pts)}"></span>${c.pts}</span>` : '';
+    return `<li${pick}><span class="n">${k + 1}</span><span><b>${esc(tk.name)}</b> <span class="reg">${esc(tk.reg)}</span><small>${sub}</small>${csub}</span><span class="p"><span class="tone ${tone(g.pts)}"></span>${g.pts}</span>${ccol}</li>`;
   }).join('');
+  $('#rounds').classList.toggle('cmp', S.phase === 'done' && !!CMP);
+  const cb = $('#cmpbar');
+  cb.hidden = !(S.phase === 'done' && CMP);
+  if (!cb.hidden) cb.innerHTML = `<span>● Εσύ <b>${nf.format(total())}</b></span><span>■ ${esc(CMP.name)} <b>${nf.format(CMP.total)}</b></span><button type="button" class="linkbtn" id="cmpClose">✕ Κλείσιμο</button>`;
   chart.classList.toggle('pref-on', S.phase === 'done'); // prefecture borders and lakes only after all five rounds
-  renderMarks(); renderExtras();
+  renderMarks(); renderExtras(); renderBoard(); renderChrome();
 }
 
 // counter boxes: days to a date ("χωρίς"), then days since it ("με"), in Greek time
@@ -900,106 +961,36 @@ function finishedGames() {
   if (S && S.phase === 'done' && !S.arch && !S.shared) games.set(S.day, S);
   return [...games.values()].sort((a, b) => (a.day < b.day ? 1 : -1)); // newest first
 }
-function renderStats() {
-  const games = finishedGames();
-  const body = $('#statsBody');
-  if (!games.length) {
-    body.innerHTML = '<p class="empty">Δεν έχεις τελειώσει κανένα παιχνίδι ακόμα. Τα στατιστικά σου θα εμφανιστούν εδώ μετά το πρώτο.</p>';
-    return;
-  }
-  const sums = games.map(g => g.guesses.reduce((a, x) => a + x.pts, 0));
-  const days = new Set(games.map(g => g.day));
-  let cur = 0, day = days.has(todayKey()) ? todayKey() : dayShift(todayKey(), -1);
-  while (days.has(day)) { cur++; day = dayShift(day, -1); }
-  let maxRun = 0, run = 0, prev = null;
-  for (const d of [...days].sort()) { run = prev && dayShift(prev, 1) === d ? run + 1 : 1; maxRun = Math.max(maxRun, run); prev = d; }
-  let perfect = 0, close = null, dsum = 0, green = 0;
-  for (const g of games) g.guesses.forEach((x, k) => {
-    if (x.pts === 1000) perfect++;
-    dsum += x.d;
-    if (tone(x.pts) === 'good') green++;
-    if (!close || x.d < close.d) close = { d: x.d, name: BYQ.get(g.targets[k]).name, day: g.day };
-  });
-  const avg = Math.round(sums.reduce((a, b) => a + b, 0) / sums.length);
-  const best = Math.max(...sums);
-  const tile = (label, value, sub) => `<div><dt>${label}</dt><dd>${value}${sub ? `<span class="sub">${sub}</span>` : ''}</dd></div>`;
-  const past = games.map((g, i) => {
-    const rows = g.guesses.map((x, k) => {
-      const t = BYQ.get(g.targets[k]), gp = BYQ.get(x.q);
-      const sub = x.q === t.qid ? 'Bingo!' : `έβαλες: ${esc(gp.name)} (${esc(gp.reg)}) · ${fmtKm(x.d)}`;
-      return `<li><span class="n">${k + 1}</span><span><b>${esc(t.name)}</b> <span class="reg">${esc(t.reg)}</span><small>${sub}</small></span><span class="p"><span class="tone ${tone(x.pts)}"></span>${x.pts}</span></li>`;
-    }).join('');
-    return `<li><details><summary><span class="pd">${esc(longFmt.format(keyDate(g.day)))}</span><span class="sq">${g.guesses.map(x => `<i class="${tone(x.pts)}"></i>`).join('')}</span><span class="pt">${nf.format(sums[i])}</span></summary><ol class="rounds">${rows}</ol></details></li>`;
-  }).join('');
-  body.innerHTML = `<div class="dlg" style="padding:0">
-    <dl class="tiles">${tile('Παιχνίδια', nf.format(games.length))}${tile('Μέσος όρος', nf.format(avg))}${tile('Καλύτερο', nf.format(best))}${tile('Σερί', cur, `μέγιστο ${maxRun}`)}</dl>
-    <dl class="stats"><div><dt>Τέλειοι γύροι</dt><dd>${perfect}<small>συνολικά</small></dd></div><div><dt>Καλύτερη μαντεψιά</dt><dd>${fmtKm(close.d)}<span class="sub">${esc(close.name)}, ${esc(shortFmt.format(keyDate(close.day)))}</span></dd></div><div><dt>Μέση απόσταση</dt><dd>${fmtKm(dsum / (games.length * 5))}<span class="sub">σε όλους τους γύρους</span></dd></div><div><dt>Πράσινοι (πετυχημένοι) γύροι</dt><dd>${Math.round(100 * green / (games.length * 5))}<small>%</small><span class="sub">800+ βαθμοί</span></dd></div></dl>
-    <div><p class="eyebrow">Προηγούμενες μέρες</p><ol class="past">${past}</ol></div>
-  </div>`;
-}
-function openStats() {
-  renderStats();
-  const d = $('#stats');
-  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
-}
-$('#statsBtn').addEventListener('click', openStats);
-$('#statsBtn2').addEventListener('click', openStats);
-$('#statsClose').addEventListener('click', () => { const d = $('#stats'); if (d.close) d.close(); else d.removeAttribute('open'); });
-$('#stats').addEventListener('click', e => { if (e.target.id === 'stats' && e.target.close) e.target.close(); });
 
 /* ---------- archive: every day from #1 on, by its number in the address (.../#3) ----------
    A past day you didn't play can be played now (marked "Αρχείο", left out of the statistics);
    one you played shows its results. Days to come never open. */
 const archShortFmt = new Intl.DateTimeFormat('el-GR', { timeZone: ATH, weekday: 'short', day: 'numeric', month: 'short' });
 const keyOfNum = n => dayShift(new Date(LAUNCH_DAY).toISOString().slice(0, 10), n - 1);
-function renderArch() {
-  const today = todayKey(), last = dayNum(today);
-  const rows = [];
-  for (let n = last; n >= 1; n--) {
-    const key = keyOfNum(n), g = store.get('day.' + key, null);
-    const ok = validState(g) && g.day === key;
-    const sum = ok ? g.guesses.reduce((a, x) => a + x.pts, 0) : 0;
-    const label = `<span><span class="dn">#${n}</span><span class="pd"><span class="dl">${esc(longFmt.format(keyDate(key)))}</span><span class="ds">${esc(archShortFmt.format(keyDate(key)))}</span>${n === last ? ' <span class="today">(Σήμερα)</span>' : ''}</span>${ok && g.arch && g.phase === 'done' ? '<span class="atag">αρχείο</span>' : ''}</span>`;
-    let right;
-    if (ok && g.phase === 'done') right = `<span class="sq">${g.guesses.map(x => `<i class="${tone(x.pts)}"></i>`).join('')}</span><span class="pt">${nf.format(sum)}</span>`;
-    else if (ok && g.guesses.length) right = `<span class="muted">${g.guesses.length}/5 γύροι</span><span class="go">Συνέχεια →</span>`;
-    else right = `<span class="muted">Δεν το έπαιξες</span><span class="go">Παίξε →</span>`;
-    rows.push(`<li${S && S.day === key ? ' class="cur"' : ''}><button type="button" data-day="${key}">${label}${right}</button></li>`);
-  }
-  $('#archBody').innerHTML = rows.join('');
-}
 const closeDlg = d => { if (d.close) d.close(); else d.removeAttribute('open'); };
-$('#archBtn').addEventListener('click', () => {
-  renderArch();
-  const d = $('#arch');
-  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
-});
-$('#archClose').addEventListener('click', () => closeDlg($('#arch')));
-$('#arch').addEventListener('click', e => {
-  if (e.target.id === 'arch') return closeDlg(e.target);
-  const b = e.target.closest('button[data-day]');
-  if (b) { closeDlg($('#arch')); openDay(b.dataset.day); }
-});
-if (PRACTICE) $('#archBtn').hidden = true;
 // the address of this page, so a copied result points at wherever it is hosted (the fork's Pages site when opened from a file)
 const SITE = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/[^/]*$/, '') : 'https://diommav.github.io/gamwtonkreza2/';
 const setNotice = t => { $('#notice').textContent = t || ''; $('#notice').hidden = !t; };
 const plainUrl = () => location.pathname + location.search;
-// open a day and put its number in the address (today: the plain address)
-function openDay(key) {
-  const want = key === todayKey() ? '' : '#' + dayNum(key);
-  if (location.hash !== want) history.pushState(null, '', want || plainUrl());
-  setNotice('');
-  loadDay(key, true);
-  here = location.hash;
+// every view has an address: today = the plain address, #N = a day, #N/xxxxxxxx = a friend's game next to yours, #meres, #parea
+const hashOfDay = n => (n >= dayNum(todayKey()) ? '' : '#' + n);
+function go(h) {
+  if (location.hash !== h) history.pushState(null, '', h || plainUrl());
+  route(true);
 }
-// read the day from the address: #N, from #1 to today
+function openDay(key) { go(hashOfDay(dayNum(key))); }
 // the address the page last settled on: a change to it (typed, or a link) opens what it names
 let here = null;
 function route(animate) { routeTo(animate); here = location.hash; }
 function routeTo(animate) {
   setNotice('');
-  const m = /^#(\d{1,5})(?:a?-.*)?$/.exec(location.hash);  // an old link that carried answers just opens its day
+  if (!PRACTICE && (location.hash === '#meres' || location.hash === '#parea')) {
+    if (!S) loadDay(todayKey(), false);
+    setView(location.hash === '#meres' ? 'days' : 'group');
+    return location.hash === '#meres' ? renderDays() : renderGroup();
+  }
+  setView('day');
+  const m = /^#(\d{1,5})(?:\/([0-9a-f]{8}))?(?:a?-.*)?$/.exec(location.hash);  // an old link that carried answers just opens its day
   if (PRACTICE || !m) {
     if (location.hash) history.replaceState(null, '', plainUrl());
     return loadDay(todayKey(), animate);
@@ -1009,8 +1000,10 @@ function routeTo(animate) {
     history.replaceState(null, '', plainUrl());
     return loadDay(todayKey(), animate);
   }
-  if (n === last) history.replaceState(null, '', plainUrl());
-  else if (location.hash !== '#' + n) history.replaceState(null, '', '#' + n);  // drop any old answers from the address
+  const want = (n === last ? '' : '#' + n) + (m[2] ? (n === last ? '#' + n : '') + '/' + m[2] : '');
+  const clean = m[2] ? '#' + n + '/' + m[2] : (n === last ? '' : '#' + n);
+  if (location.hash !== clean) history.replaceState(null, '', clean || plainUrl());
+  pendingCmp = m[2] || null;
   loadDay(keyOfNum(n), animate);
 }
 addEventListener('popstate', () => route(true));
@@ -1069,7 +1062,12 @@ function showRound(k) {
 $('#pips').addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) showRound(+b.dataset.k); });
 $('#rounds').addEventListener('click', e => { const li = e.target.closest('li[data-k]'); if (li && !e.target.closest('a')) showRound(+li.dataset.k); });
 $('#back').addEventListener('click', () => { view = null; renderAll(); focusView(true); $('#share').focus({ preventScroll: true }); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && view != null && !$('#stats').open && !$('#arch').open) { view = null; renderAll(); focusView(true); } });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (CMP) return closeCompare(); if (view != null) { view = null; renderAll(); focusView(true); } return; }
+  if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !PRACTICE && VIEW === 'day' && document.activeElement === document.body && !e.metaKey && !e.ctrlKey && !e.altKey && !$('#who').open) {
+    const b = $(e.key === 'ArrowLeft' ? '#dayPrev' : '#dayNext'); if (!b.disabled) b.click();
+  }
+});
 
 function copyResult(done = 'Αντιγράφηκε!') {
   const sq = { good: '🟩', mid: '🟨', bad: '🟥' };
@@ -1096,7 +1094,6 @@ function copyResult(done = 'Αντιγράφηκε!') {
   } catch { fallback(); }
 }
 $('#share').addEventListener('click', () => copyResult());
-$('#mine').addEventListener('click', () => openDay(S.day));
 // the Marilena button: the same copy, only the thank-you line is different
 $('#share2').addEventListener('click', () => copyResult('Αντιγράφτηκε, Μαριλένα. Στείλ’ το στην Tradλeague.'));
 
@@ -1213,6 +1210,23 @@ function drawScale() {
   ovl.innerHTML = `<path class="sb" d="M${x1.toFixed(1)},${y - 6}V${y}H${x2.toFixed(1)}V${y - 6}"/><text class="gl" x="${x1.toFixed(1)}" y="${y - 9}">${nice} χλμ</text>`;
 }
 
+// a friend's game next to yours: white squares, dotted lines to the right place
+const cln = (a, b) => `<line class="link cmp" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"/>`;
+function cmpMarks() {
+  if (!CMP || S.phase !== 'done') return '';
+  let h = '';
+  const sk = shown();
+  (sk != null ? [sk] : [0, 1, 2, 3, 4]).forEach(k => {
+    const t = target(k), c = CMP.rounds[k];
+    if (c.q === t.qid) return;
+    const cp = BYQ.get(c.q);
+    h += cln(t, cp);
+    h += sk != null
+      ? mk(cp, `<rect x="-5" y="-5" width="10" height="10"/><text class="lab" y="${cp.y < t.y ? -12 : 21}">${esc(CMP.name)}: ${esc(cp.name)}</text>`, 'cgs')
+      : mk(cp, '<rect x="-4" y="-4" width="8" height="8"/>', 'cgs sm');
+  });
+  return h;
+}
 const mk = (p, inner, cls) => `<g class="${cls}" data-x="${p.x}" data-y="${p.y}"${p.qid ? ` data-q="${p.qid}"` : ''}>${inner}</g>`;
 const ln = (a, b, pts) => `<line class="link ${tone(pts)}" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"/>`;
 function renderMarks() {
@@ -1236,7 +1250,7 @@ function renderMarks() {
     });
     S.targets.forEach((q, k) => { h += mk(BYQ.get(q), `<circle r="10"/><text>${k + 1}</text>`, 'num'); });
   }
-  ovm.innerHTML = h;
+  ovm.innerHTML = cmpMarks() + h;
   placeMarks();
   if (card) closeCard();  // a new screen: the card goes
 }
@@ -1618,9 +1632,9 @@ function focusView(animate) {
   if (S.phase === 'play') { fitPad = PW < 600 ? 6 : 18; fitBoxNow = target(S.round).x > GR_PLAY[2] - 20 ? GR_BOX : playBox(fitPad); }
   else if (shown() != null) {
     const k = shown(), g = S.guesses[k];
-    fitBoxNow = boxAround([target(k), BYQ.get(g.q)], 90); fitPad = 64;
+    fitBoxNow = boxAround([target(k), BYQ.get(g.q), ...(CMP ? [BYQ.get(CMP.rounds[k].q)] : [])], 90); fitPad = 64;
   } else {
-    fitBoxNow = boxAround([...S.targets.map(q => BYQ.get(q)), ...S.guesses.map(g => BYQ.get(g.q))], 200); fitPad = 48;
+    fitBoxNow = boxAround([...S.targets.map(q => BYQ.get(q)), ...S.guesses.map(g => BYQ.get(g.q)), ...(CMP ? CMP.rounds.map(r => BYQ.get(r.q)) : [])], 200); fitPad = 48;
   }
   goTo(fit(fitBoxNow, fitPad), animate);
 }
@@ -1719,95 +1733,163 @@ async function submitScoreRaw() {
     S.lbSent = true; save();
   } catch (e) { console.warn('leaderboard submit failed', e); }
 }
-async function submitScore() { await submitScoreRaw(); renderEndLb(); }
-// the big leaderboard under the final score (daily game only)
-const endRetry = {};
-async function renderEndLb(noScroll) {
-  const box = $('#endlb');
-  const show = !PRACTICE && S && S.phase === 'done';
-  box.hidden = !show;
-  if (!show) return;
-  try { lbData = await rpc('get_leaderboard', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_day: S.day }); }
-  catch (e) { $('#endrank').textContent = 'Η κατάταξη δεν φορτώνει τώρα.'; return; }
-  const me = lbData.me && lbData.me.today_rank, n = lbData.players_today, isToday = S.day === todayKey();
-  if (!me && S.lbSent && lbOn() && !S.shared && !endRetry[S.day]) {  // marked as sent, but the server has no score: send again
-    endRetry[S.day] = true; delete S.lbSent; save(); await submitScoreRaw(); return renderEndLb(noScroll);
-  }
-  if (me) { const nt = $('#notice'); if (nt && nt.textContent.startsWith('🔒')) setNotice(''); }
-  $('#endrank').textContent = me ? `Είσαι #${me} από ${n} παίκτες${isToday ? ' σήμερα' : ''}` : `Παίκτες${isToday ? ' σήμερα' : ''}: ${n}`;
-  $('#endlb .endtitle').textContent = isToday ? '🏆 Κατάταξη σήμερα' : `🏆 Κατάταξη #${dayNum(S.day)} · ${longFmt.format(keyDate(S.day))}`;
-  $('#endList').innerHTML = lbData.day.length
-    ? lbData.day.map((r, i) => rankRow(r, i, S.day)).join('')
-    : '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>';
-  if (!noScroll && !$('#done').hidden && !S.shared) box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-}
-let lbTab = 'day', lbData = null;
-const lbDay = () => (!PRACTICE && S ? S.day : todayKey());
+async function submitScore() { await submitScoreRaw(); loadBoard(); }
 const fmtDur = ms => { const t = Math.round(ms / 1000); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
-let viewPid = null;  // whose game is on the map right now (from the leaderboard)
-const rankRow = (r, i, day) => `<li${r.me ? ' class="me"' : (S && S.shared && r.pid && r.pid === viewPid) ? ' class="viewing"' : ''}${r.pid ? ` data-pid="${r.pid}" data-day="${day}" tabindex="0" role="button" title="Δες τις επιλογές"` : ''}><span>${i + 1}.</span><span class="n">${esc(r.name)}${r.duration_ms ? `<span class="dur">${fmtDur(r.duration_ms)}</span>` : ''}${r.late ? '<span class="dur">αρχείο</span>' : ''}</span><span class="t">${nf.format(r.total)}</span></li>`;
-async function viewPlayer(pid, day, fromDialog) {
-  const say = t => { if (fromDialog) $('#lbNote').textContent = t; else setNotice(t); };
-  let g;
-  try { g = await rpc('get_game', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_player: pid, p_day: day || null }); }
-  catch (e) { return say('Δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.'); }
-  if (!g.found) return say('Δεν βρέθηκε παιχνίδι.');
-  if (g.locked) return say(`🔒 Τελείωσε πρώτα ${g.day === todayKey() ? 'το σημερινό παιχνίδι' : 'το παιχνίδι #' + dayNum(g.day)} για να δεις τις επιλογές των άλλων.`);
-  const rounds = g.rounds || [];
-  const targets = rounds.map((r, k) => (r.t && BYQ.has(r.t) ? r.t : dailyTargets(g.day)[k]));
-  if (rounds.length !== 5 || !targets.every(q => BYQ.has(q)) || !rounds.every(r => BYQ.has(r.q))) return say('Αυτό το παιχνίδι δεν μπορεί να εμφανιστεί.');
-  // same read-only view a shared link opens: never saved, never counted
-  S = { v: SAVE_V, day: g.day, targets, guesses: rounds.map(r => ({ q: r.q, d: r.d, pts: r.pts })), round: 4, phase: 'done', arch: g.day !== todayKey(), shared: g.name };
-  view = null; clearInput(); setNotice(''); viewPid = pid;
-  if (fromDialog) closeDlg($('#lb'));
-  renderAll(); focusView(true); renderEndLb(true);
-  $('#panel').scrollIntoView({ block: 'start', behavior: 'smooth' });
-}
-for (const el of [$('#lbList'), $('#endList')]) {
-  const open = li => {
-    if (!li) return;
-    if (li.classList.contains('me')) { if (el.id === 'lbList') closeDlg($('#lb')); openDay(todayKey()); return; }
-    viewPlayer(li.dataset.pid, li.dataset.day || null, el.id === 'lbList');
-  };
-  el.addEventListener('click', e => open(e.target.closest('li[data-pid]')));
-  el.addEventListener('keydown', e => { const li = e.target.closest('li[data-pid]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(li); } });
-}
+const pid8 = x => x.slice(0, 8);
+const sqs = (pts, hide) => `<span class="bsq${hide ? ' hide' : ''}">${[0, 1, 2, 3, 4].map(k => `<i class="${pts && pts[k] != null ? tone(pts[k]) : ''}"></i>`).join('')}</span>`;
 
-function lbRender() {
-  $('#lbTabDay').textContent = lbDay() === todayKey() ? 'Σήμερα' : '#' + dayNum(lbDay());
-  $('#lbTabDay').setAttribute('aria-pressed', lbTab === 'day'); $('#lbTabAll').setAttribute('aria-pressed', lbTab === 'alltime');
-  const rows = lbData ? lbData[lbTab] : null;
-  $('#lbList').innerHTML = !rows ? '<li><span></span><span>Φόρτωση…</span><span></span></li>'
-    : !rows.length ? '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span></li>'
-    : rows.map((r, i) => rankRow(r, i, lbTab === 'day' ? lbDay() : '')).join('');
-  $('#lbNote').textContent = lbData ? `Παίκτες${lbDay() === todayKey() ? ' σήμερα' : ''}: ${lbData.players_today}` + (lbData.me && lbData.me.games ? ` · Το καλύτερό σου: ${nf.format(lbData.me.best)}` : '') : '';
+/* ---------- the day page: the group's board for the open day ---------- */
+const boardRetry = {};
+async function loadBoard() {
+  if (PRACTICE || !S) return;
+  const day = S.day;
+  let b;
+  try { b = await rpc('get_day', { p_cookie: getPid(false) || NIL, p_day: day }); }
+  catch (e) { $('#dayBoard').hidden = false; $('#boardHead').textContent = 'Η παρέα'; $('#boardList').innerHTML = ''; $('#boardNote').textContent = 'Η κατάταξη δεν φορτώνει τώρα.'; return; }
+  if (!S || S.day !== day) return;  // another day was opened meanwhile
+  if (S.phase === 'done' && !S.shared && !b.rows.some(r => r.me) && S.lbSent && lbOn() && !boardRetry[day]) {  // marked as sent, but the server has no score: send again
+    boardRetry[day] = true; delete S.lbSent; save(); await submitScoreRaw(); return loadBoard();
+  }
+  BOARD = b;
+  if (b.rows.some(r => r.me)) { const nt = $('#notice'); if (nt && nt.textContent.startsWith('🔒')) setNotice(''); }
+  renderBoard();
+  if (pendingCmp) { const r = b.rows.find(x => x.pid.startsWith(pendingCmp)); pendingCmp = null; if (r && !r.me && S.phase === 'done') openCompare(r.pid, false); }
 }
-async function lbLoad() {
-  try { lbData = await rpc('get_leaderboard', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000', p_day: lbDay() }); }
-  catch (e) { lbData = null; $('#lbList').innerHTML = '<li><span></span><span>Η κατάταξη δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.</span><span></span></li>'; return; }
-  lbRender();
+function renderBoard() {
+  const box = $('#dayBoard');
+  if (PRACTICE || !S || !BOARD) { box.hidden = true; return; }
+  box.hidden = false;
+  const b = BOARD, n = b.players, mine = b.rows.find(r => r.me), num = dayNum(S.day);
+  $('#boardHead').textContent = `Η παρέα στο #${num} · ${n} ${n === 1 ? 'έπαιξε' : 'έπαιξαν'}` + (mine ? ` · είσαι #${mine.rank}` : '');
+  const folded = S.phase !== 'done' && !S.preview;  // mid-game: just the count, no results
+  $('#boardList').hidden = folded;
+  if (folded) { $('#boardNote').textContent = 'Η κατάταξη ανοίγει όταν τελειώσεις αυτό το παιχνίδι.'; return; }
+  $('#boardList').innerHTML = b.rows.length ? b.rows.map(r => `<li${r.me ? ' class="me"' : CMP && CMP.pid === r.pid ? ' class="viewing"' : ''} data-pid="${r.pid}" tabindex="0" role="button" title="${r.me ? 'Εσύ' : 'Δες τις επιλογές στο χάρτη'}"><span>${r.rank}.</span><span class="nm">${esc(r.name)}<small>${r.duration_ms ? fmtDur(r.duration_ms) : ''}${r.late ? ' · αρχείο' : ''}</small></span>${sqs(r.pts, !r.pts)}<span class="t">${nf.format(r.total)}</span></li>`).join('')
+    : '<li><span></span><span>Ακόμα κανένα σκορ.</span><span></span><span></span></li>';
+  $('#boardNote').textContent = !b.me_played ? `🔒 Οι επιλογές τους ανοίγουν όταν τελειώσεις το #${num}.` : b.rows.length > 1 ? 'Πάτα ένα όνομα για σύγκριση στο χάρτη.' : '';
 }
-function lbOptinRender() {
-  const on = lbOn();
-  $('#lbOn').checked = on;
-  $('#lbOn').closest('label').hidden = true;
-  $('#lbDelRow').hidden = !on;
+const boardSay = t => { $('#boardNote').textContent = t; };
+function boardPick(li) {
+  if (li.classList.contains('me')) { if (CMP) closeCompare(); return; }
+  if (!BOARD || !BOARD.me_played) return boardSay(`🔒 Τελείωσε πρώτα το #${dayNum(S.day)} για να δεις τις επιλογές των άλλων.`);
+  if (S.phase !== 'done') return boardSay('Το παιχνίδι σου είναι σε άλλη συσκευή. Παίξε το εδώ ή άνοιξέ το από εκεί.');
+  if (CMP && CMP.pid === li.dataset.pid) return closeCompare();
+  openCompare(li.dataset.pid, true);
 }
-function openLb() {
-  lbOptinRender(); $('#lbMsg').textContent = ''; lbData = null; lbRender(); lbLoad();
-  const d = $('#lb');
-  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+$('#boardList').addEventListener('click', e => { const li = e.target.closest('li[data-pid]'); if (li) boardPick(li); });
+$('#boardList').addEventListener('keydown', e => { const li = e.target.closest('li[data-pid]'); if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); boardPick(li); } });
+async function openCompare(pid, push) {
+  let g;
+  try { g = await rpc('get_game', { p_cookie: getPid(false) || NIL, p_player: pid, p_day: S.day }); }
+  catch (e) { return boardSay('Δεν φορτώνει τώρα. Δοκίμασε ξανά σε λίγο.'); }
+  if (!g.found) return boardSay('Δεν βρέθηκε παιχνίδι.');
+  if (g.locked) return boardSay(`🔒 Τελείωσε πρώτα το #${dayNum(S.day)} για να δεις τις επιλογές των άλλων.`);
+  const rounds = (g.rounds || []).map(r => ({ q: r.q, d: r.d, pts: r.pts }));
+  if (rounds.length !== 5 || !rounds.every(r => BYQ.has(r.q))) return boardSay('Αυτό το παιχνίδι δεν μπορεί να εμφανιστεί.');
+  const had = !!CMP;
+  CMP = { pid, name: g.name, rounds, total: g.total };
+  if (push) { history[had ? 'replaceState' : 'pushState'](null, '', `#${dayNum(S.day)}/${pid8(pid)}`); if (!had) cmpPushed = true; here = location.hash; }
+  view = null; renderAll(); focusView(true);
+  $('#cmpbar').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
-$('#lbBtn').addEventListener('click', openLb);
-$('#lbClose').addEventListener('click', () => { const d = $('#lb'); if (d.close) d.close(); else d.removeAttribute('open'); });
-$('#lb').addEventListener('click', e => { if (e.target.id === 'lb' && e.target.close) e.target.close(); });
-$('#lbTabDay').addEventListener('click', () => { lbTab = 'day'; lbRender(); });
-$('#lbTabAll').addEventListener('click', () => { lbTab = 'alltime'; lbRender(); });
-$('#lbDel').addEventListener('click', async () => {
+function closeCompare() {
+  if (!CMP) return;
+  if (cmpPushed) { cmpPushed = false; history.back(); return; }  // the popstate reopens the plain day
+  CMP = null; history.replaceState(null, '', hashOfDay(dayNum(S.day)) || plainUrl()); here = location.hash;
+  renderAll(); focusView(true);
+}
+$('#cmpbar').addEventListener('click', e => { if (e.target.closest('#cmpClose')) closeCompare(); });
+$('#playNow').addEventListener('click', () => {
+  if (!S || !S.preview) return;
+  S.preview = false; roundStart(); renderAll(); focusView(true);
+  if (finePointer) inp.focus({ preventScroll: true });
+});
+
+/* ---------- tabs and the day bar ---------- */
+function setView(v) {
+  VIEW = v;
+  const app = $('.app'); app.classList.toggle('v-days', v === 'days'); app.classList.toggle('v-group', v === 'group');
+  $('#viewDays').hidden = v !== 'days'; $('#viewGroup').hidden = v !== 'group';
+  renderChrome();
+}
+function renderChrome() {
+  const off = PRACTICE;
+  $('#tabs3').hidden = off; $('#dayPrev').hidden = off; $('#dayNext').hidden = off;
+  if (off || !S) return;
+  const today = todayKey(), n = dayNum(S.day);
+  const cur = VIEW === 'group' ? 'Group' : VIEW === 'days' || S.day !== today ? 'Days' : 'Today';
+  for (const k of ['Today', 'Days', 'Group']) { const b = $('#tab' + k); if (k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
+  const tdone = (store.get('day.' + today, {}) || {}).phase === 'done';
+  $('#tabToday').classList.toggle('dot', !tdone);
+  $('#dayPrev').disabled = n <= 1; $('#dayNext').disabled = n >= dayNum(today);
+}
+$('#tabToday').addEventListener('click', () => go(''));
+$('#tabDays').addEventListener('click', () => go('#meres'));
+$('#tabGroup').addEventListener('click', () => go('#parea'));
+$('#dayPrev').addEventListener('click', () => { if (S) go(hashOfDay(dayNum(S.day) - 1)); });
+$('#dayNext').addEventListener('click', () => { if (S) go(hashOfDay(dayNum(S.day) + 1)); });
+
+/* ---------- «Μέρες» and «Παρέα»: the history, from the server (what the others did) and this device (what you are in the middle of) ---------- */
+async function loadHist() { try { HIST = await rpc('get_history', { p_cookie: getPid(false) || NIL }); } catch (e) { console.warn('history failed', e); HIST = null; } }
+async function renderDays() {
+  const el = $('#daysList');
+  if (!HIST) el.innerHTML = '<li><button type="button" disabled><span class="muted">Φόρτωση…</span><span></span><span></span></button></li>';
+  await loadHist();
+  if (VIEW !== 'days') return;
+  const last = dayNum(todayKey()); let played = 0; const rows = [];
+  for (let n = last; n >= 1; n--) {
+    const key = keyOfNum(n), hd = HIST && HIST.days.find(x => x.day === key), loc = store.get('day.' + key, null);
+    const lok = validState(loc) && loc.day === key;
+    const doneHere = lok && loc.phase === 'done', mine = hd && hd.me;
+    const pts = mine ? mine.pts : doneHere ? loc.guesses.map(x => x.pts) : null;
+    const total = mine ? mine.total : doneHere ? loc.guesses.reduce((a, x) => a + x.pts, 0) : 0;
+    if (mine || doneHere) played++;
+    const late = (mine ? mine.late : doneHere && loc.arch) && n !== last;
+    const win = hd ? (hd.top ? `🏆 ${esc(hd.top.name)} ${nf.format(hd.top.total)} · ${hd.players} ${hd.players === 1 ? 'έπαιξε' : 'έπαιξαν'}` : 'Κανείς ακόμα') : '';
+    const label = `<span><span class="dn">#${n}</span><span class="pd"><span class="dl">${esc(longFmt.format(keyDate(key)))}</span><span class="ds">${esc(archShortFmt.format(keyDate(key)))}</span>${n === last ? ' <span class="today">σήμερα</span>' : late ? '<span class="atag">αρχείο</span>' : ''}</span>${win ? `<span class="win">${win}</span>` : ''}</span>`;
+    let right;
+    if (pts) right = `${sqs(pts)}<span class="pt">${nf.format(total)}</span>`;
+    else if (lok && loc.guesses.length) right = `<span class="muted">${loc.guesses.length}/5</span><span class="go">Συνέχεια →</span>`;
+    else right = `<span class="muted"></span><span class="go">Παίξε →</span>`;
+    rows.push(`<li${S && S.day === key ? ' class="cur"' : ''}><button type="button" data-n="${n}">${label}${right}</button></li>`);
+  }
+  $('#daysHead').textContent = `${last} ${last === 1 ? 'μέρα' : 'μέρες'} · έπαιξες ${played} · σου λείπουν ${last - played}`;
+  el.innerHTML = rows.join('');
+}
+$('#daysList').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (b) go(hashOfDay(+b.dataset.n)); });
+async function renderGroup() {
+  if (!HIST) $('#grpList').innerHTML = '<li class="sep">Φόρτωση…</li>';
+  await loadHist();
+  if (VIEW !== 'group') return;
+  if (!HIST) { $('#grpMe').innerHTML = ''; $('#grpList').innerHTML = '<li class="sep">Η κατάταξη δεν φορτώνει τώρα.</li>'; return; }
+  const last = dayNum(todayKey()), me = HIST.me;
+  const tile = (label, value, sub) => `<div><dt>${label}</dt><dd>${value}${sub ? `<span class="sub">${sub}</span>` : ''}</dd></div>`;
+  $('#grpMe').innerHTML = me
+    ? `<p class="eyebrow">Εσύ, σε όλες τις μέρες</p><dl class="tiles">${tile('Μέρες', `${me.games}<small>/${last}</small>`)}${tile('Μέσος όρος', nf.format(me.avg))}${tile('Καλύτερο', nf.format(me.best))}${tile('Σερί', me.streak, `μέγιστο: ${me.max_streak}`)}</dl>
+       <dl class="stats" style="margin-top:10px"><div><dt>Τέλειοι γύροι</dt><dd>${me.perfect}<small>συνολικά</small></dd></div><div><dt>Πράσινοι γύροι</dt><dd>${me.rounds ? Math.round(me.green / me.rounds * 100) : 0}%</dd></div>${me.closest && BYQ.has(me.closest.q) ? `<div><dt>Καλύτερη μαντεψιά</dt><dd>${fmtKm(me.closest.km)}<span class="sub">${esc(BYQ.get(me.closest.q).name)}, #${dayNum(me.closest.day)}</span></dd></div>` : ''}</dl>`
+    : '<p class="empty">Παίξε μια μέρα για να μπεις στον πίνακα της παρέας.</p>';
+  for (const b of $('#grpSort').children) b.setAttribute('aria-pressed', b.dataset.s === grpSort);
+  const val = p => grpSort === 'wins' ? p.wins : grpSort === 'sum' ? nf.format(p.sum) : nf.format(p.avg);
+  const key = p => grpSort === 'wins' ? p.wins : grpSort === 'sum' ? p.sum : p.avg;
+  const ps = HIST.players.slice().sort((a, b) => key(b) - key(a) || b.games - a.games);
+  const main = grpSort === 'avg' ? ps.filter(p => p.games >= 3) : ps, few = grpSort === 'avg' ? ps.filter(p => p.games < 3) : [];
+  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><details><summary><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span>${p.wins ? '🏆' + p.wins : ''}</span></summary><ol class="pdays">${(p.days || []).map(d => `<li><button type="button" data-go="${p.me ? hashOfDay(dayNum(d.day)) : '#' + dayNum(d.day) + '/' + pid8(p.pid)}"><span>#${dayNum(d.day)} · ${esc(archShortFmt.format(keyDate(d.day)))}${d.late ? ' · αρχείο' : ''}</span><span>${nf.format(d.total)}</span></button></li>`).join('')}</ol></details></li>`;
+  $('#grpList').innerHTML = (main.length || few.length ? main.map(row).join('') + (few.length ? `<li class="sep">λίγες μέρες (κάτω από 3)</li>` + few.map((p, i) => row(p, main.length + i)).join('') : '') : '<li class="sep">Κανείς ακόμα.</li>');
+}
+$('#grpSort').addEventListener('click', e => { const b = e.target.closest('button[data-s]'); if (b) { grpSort = b.dataset.s; renderGroup(); } });
+$('#grpList').addEventListener('click', e => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); });
+
+/* ---------- the name: shown in a small menu, with logout and delete ---------- */
+function renderChip() {
+  const nm = (store.get('name', '') || '').trim();
+  $('#whomenu').hidden = PRACTICE || !nm;
+  $('#whoChip').textContent = nm + ' ▾';
+}
+$('#delBtn').addEventListener('click', async () => {
   if (!confirm('Να διαγραφούν όλα τα σκορ και τα δεδομένα σου από την κατάταξη;')) return;
-  try { await rpc('delete_me', { p_cookie: getPid(false) || '00000000-0000-4000-8000-000000000000' }); } catch { $('#lbMsg').textContent = 'Η διαγραφή απέτυχε. Δοκίμασε ξανά.'; return; }
+  try { await rpc('delete_me', { p_cookie: getPid(false) || NIL }); } catch { alert('Η διαγραφή απέτυχε. Δοκίμασε ξανά.'); return; }
   lbSetOn(false); document.cookie = 'gk_pid=; max-age=0; path=/'; if (S) { delete S.lbSent; save(); }
-  lbOptinRender(); $('#lbMsg').textContent = 'Διαγράφηκαν.'; lbLoad();
+  location.reload();  // the name dialog asks again
 });
 
 // logout: this browser becomes a new player (new cookie, new fingerprint salt, empty local data).
@@ -1822,10 +1904,10 @@ function logout() {
   location.href = plainUrl();
 }
 $('#logoutBtn').addEventListener('click', logout);
-$('#lbOut').addEventListener('click', logout);
 
 /* ---------- entry gate: everyone must pick a name before playing ---------- */
 function greet(nm) {
+  renderChip();
   const h = $('#hello'); h.textContent = `Γεια ${nm}!`; h.hidden = false;
   clearTimeout(greet.t); greet.t = setTimeout(() => { h.hidden = true; }, 6000);
 }
@@ -1860,7 +1942,7 @@ $('#whoForm').addEventListener('submit', async e => {
 
 /* ---------- start ---------- */
 function start(data) {
-  measure(); renderBand();
+  measure(); renderBand(); renderChip();
   if (data && validState(data.S)) { S = data.S; renderAll(); focusView(false); }
   else route(false);
   submitScore();
