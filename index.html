@@ -116,13 +116,9 @@ a:hover { text-decoration-style: solid; }
 .grp { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .grp > li { border-bottom: 1px solid var(--border); }
 .grp > li.sep { padding: 10px 2px 4px; font: 500 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); border-bottom: 0; }
-.grp summary { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 2px; cursor: pointer; list-style: none; }
-.grp summary::-webkit-details-marker { display: none; }
-.grp li.me > details > summary { background: var(--accent-neon); }
+.grp .prow { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 2px; }
+.grp li.me > .prow { background: var(--accent-neon); }
 .grp .v { font: 700 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; }
-.grp .pdays { list-style: none; margin: 0 0 8px; padding: 0 0 0 34px; }
-.grp .pdays button { width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 6px 4px; background: none; border: 0; font: 500 var(--fs-3) var(--mono); text-align: left; cursor: pointer; }
-.grp .pdays button:hover { background: var(--accent-neon); }
 .sort { display: flex; gap: 6px; margin: 12px 0 8px; }
 .sort button { flex: 1; min-height: 34px; background: var(--card); border: 2px solid var(--foreground); font: 700 var(--fs-1) var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--foreground); cursor: pointer; }
 .sort button[aria-pressed="true"] { background: var(--accent-neon); }
@@ -1868,11 +1864,10 @@ async function renderGroup() {
   const key = p => grpSort === 'wins' ? p.wins : grpSort === 'sum' ? p.sum : p.avg;
   const ps = HIST.players.slice().sort((a, b) => key(b) - key(a) || b.games - a.games);
   const main = grpSort === 'avg' ? ps.filter(p => p.games >= 3) : ps, few = grpSort === 'avg' ? ps.filter(p => p.games < 3) : [];
-  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><details><summary><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span>${p.wins ? '🏆' + p.wins : ''}</span></summary><ol class="pdays">${(p.days || []).map(d => `<li><button type="button" data-go="${p.me ? hashOfDay(dayNum(d.day)) : '#' + dayNum(d.day) + '/' + pid8(p.pid)}"><span>#${dayNum(d.day)} · ${esc(archShortFmt.format(keyDate(d.day)))}${d.late ? ' · αρχείο' : ''}</span><span>${nf.format(d.total)}</span></button></li>`).join('')}</ol></details></li>`;
+  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><div class="prow"><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span>${p.wins ? '🏆' + p.wins : ''}</span></div></li>`;
   $('#grpList').innerHTML = (main.length || few.length ? main.map(row).join('') + (few.length ? `<li class="sep">λίγες μέρες (κάτω από 3)</li>` + few.map((p, i) => row(p, main.length + i)).join('') : '') : '<li class="sep">Κανείς ακόμα.</li>');
 }
 $('#grpSort').addEventListener('click', e => { const b = e.target.closest('button[data-s]'); if (b) { grpSort = b.dataset.s; renderGroup(); } });
-$('#grpList').addEventListener('click', e => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); });
 
 /* ---------- the name: shown in a small menu, with logout and delete ---------- */
 function renderChip() {
