@@ -1133,12 +1133,13 @@ function fit(box, pad) {
   return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 + (padB / 2) * s, s };
 }
 function clampV() {
-  // zoomed out no further than "all of Greece fits" (or the drawn map's own size, if that is bigger):
-  // past that the map would shrink inside the screen and show empty margins
-  const sMax = Math.max(Math.min(MW / Math.max(PW, 1), MH / Math.max(PH, 1)), fit(GR_BOX, 18).s);
+  // the view always lies wholly inside the drawn map: no zooming out past it, no panning past its edges,
+  // so the empty margin around the map can never be seen
+  const sMax = Math.min(MW / Math.max(PW, 1), MH / Math.max(PH, 1));
   V.s = Math.min(sMax, Math.max(0.015, V.s));  // closest: 15 m per pixel, enough to part the names of crowded suburbs
-  V.cx = Math.min(MW, Math.max(0, V.cx));
-  V.cy = Math.min(MH, Math.max(0, V.cy));
+  const hw = PW / 2 * V.s, hh = PH / 2 * V.s;
+  V.cx = Math.min(MW - hw, Math.max(hw, V.cx));
+  V.cy = Math.min(MH - hh, Math.max(hh, V.cy));
 }
 const vx = () => V.cx - PW * V.s / 2, vy = () => V.cy - PH * V.s / 2;
 const toScreen = (x, y) => [(x - vx()) / V.s, (y - vy()) / V.s];
@@ -1233,8 +1234,9 @@ function cmpMarks() {
   });
   return h;
 }
-const mk = (p, inner, cls) => `<g class="${cls}" data-x="${p.x}" data-y="${p.y}"${p.qid ? ` data-q="${p.qid}"` : ''}>${inner}</g>`;
-const ln = (a, b, pts) => `<line class="link ${tone(pts)}" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"/>`;
+const mk = (p, inner, cls, x = '') => `<g class="${cls}" data-x="${p.x}" data-y="${p.y}"${p.qid ? ` data-q="${p.qid}"` : ''}${x}>${inner}</g>`;
+const ka = (k, t) => ` data-k="${k}" data-tq="${t.qid}"`;  // marks that glide to their place when another player's game is shown
+const ln = (a, b, pts, x = '') => `<line class="link ${tone(pts)}" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"${x}/>`;
 function gvMarks() {
   let h = '';
   const k = GV.k, T = i => BYQ.get(GV.targets[i]), G = i => BYQ.get(GV.rounds[i].q);
@@ -1242,17 +1244,45 @@ function gvMarks() {
     const t = T(k), gp = G(k), r = GV.rounds[k];
     if (GV.rounds[k].q !== GV.targets[k]) {
       const above = gp.y < t.y;
-      h += ln(t, gp, r.pts);
-      h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss');
+      h += ln(t, gp, r.pts, ka(k, t));
+      h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss', ka(k, t));
       h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="${above ? 23 : -14}">${esc(t.name)}</text>`, 'tgt');
     } else h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="-14">${esc(t.name)}</text>`, 'tgt');
   } else {
-    GV.rounds.forEach((r, i) => { if (r.q !== GV.targets[i]) h += ln(T(i), G(i), r.pts) + mk(G(i), '<circle r="4"/>', 'gss sm'); });
+    GV.rounds.forEach((r, i) => { if (r.q !== GV.targets[i]) h += ln(T(i), G(i), r.pts, ka(i, T(i))) + mk(G(i), '<circle r="4"/>', 'gss sm', ka(i, T(i))); });
     GV.targets.forEach((q, i) => { h += mk(BYQ.get(q), `<circle r="10"/><text>${i + 1}</text>`, 'num'); });
   }
   return h;
 }
+let markAnim = 0;
 function renderMarks() {
+  cancelAnimationFrame(markAnim); markAnim = 0;
+  const prev = {};  // where each round's guess sat on screen: the new guesses glide from there
+  for (const el of ovm.querySelectorAll('g[data-k]')) prev[el.dataset.k] = { tq: el.dataset.tq, x: +el.dataset.x, y: +el.dataset.y };
+  renderMarksNow();
+  if (reduced) return;
+  const mv = [];
+  for (const el of ovm.querySelectorAll('[data-k]')) {
+    const o = prev[el.dataset.k];
+    if (!o || o.tq !== el.dataset.tq) continue;
+    const line = el.tagName === 'line', ex = +(line ? el.dataset.x2 : el.dataset.x), ey = +(line ? el.dataset.y2 : el.dataset.y);
+    if (Math.hypot(ex - o.x, ey - o.y) < 0.5) continue;
+    mv.push({ el, line, fx: o.x, fy: o.y, ex, ey });
+  }
+  if (!mv.length) return;
+  const set = (m, x, y) => { if (m.line) { m.el.dataset.x2 = x; m.el.dataset.y2 = y; } else { m.el.dataset.x = x; m.el.dataset.y = y; } };
+  mv.forEach(m => set(m, m.fx, m.fy)); placeMarks();
+  const t0 = performance.now(), dur = 750;
+  const step = now => {
+    let k = Math.min(1, (now - t0) / dur);
+    k = k < .5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
+    mv.forEach(m => set(m, m.fx + (m.ex - m.fx) * k, m.fy + (m.ey - m.fy) * k));
+    placeMarks();
+    markAnim = now - t0 < dur ? requestAnimationFrame(step) : 0;
+  };
+  markAnim = requestAnimationFrame(step);
+}
+function renderMarksNow() {
   if (VIEW === 'group' && GV) { ovm.innerHTML = gvMarks(); placeMarks(); if (card) closeCard(); return; }
   let h = '';
   if (S.phase === 'play') {
@@ -1261,8 +1291,8 @@ function renderMarks() {
     const k = shown(), t = target(k), g = vg()[k], gp = BYQ.get(g.q);
     if (g.q !== t.qid) {
       const above = gp.y < t.y;
-      h += ln(t, gp, g.pts);
-      h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss');
+      h += ln(t, gp, g.pts, ka(k, t));
+      h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss', ka(k, t));
       h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="${above ? 23 : -14}">${esc(t.name)}</text>`, 'tgt');
     } else {
       h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="-14">${esc(t.name)}</text>`, 'tgt');
@@ -1270,7 +1300,7 @@ function renderMarks() {
   } else {
     if (OPT.ans) vg().forEach((g, k) => {  // the player's answers, unless switched off on the map
       const t = target(k), gp = BYQ.get(g.q);
-      if (g.q !== t.qid) h += ln(t, gp, g.pts) + mk(gp, '<circle r="4"/>', 'gss sm');
+      if (g.q !== t.qid) h += ln(t, gp, g.pts, ka(k, t)) + mk(gp, '<circle r="4"/>', 'gss sm', ka(k, t));
     });
     S.targets.forEach((q, k) => { h += mk(BYQ.get(q), `<circle r="10"/><text>${k + 1}</text>`, 'num'); });
   }
