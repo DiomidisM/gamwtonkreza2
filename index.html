@@ -158,7 +158,6 @@ a:hover { text-decoration-style: solid; }
 .ov .gss circle { fill: var(--guess); stroke: var(--dot-ring); stroke-width: 1.5; }
 .ov .gss .lab { font-weight: 500; }
 .ov .link { stroke: var(--muted-foreground); stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
-.ov .dist { font: 700 var(--fs-4) var(--mono); fill: var(--foreground); paint-order: stroke; stroke: var(--background); stroke-width: 4px; stroke-linejoin: round; text-anchor: middle; }
 .ov .num circle { fill: var(--target); stroke: var(--dot-ring); stroke-width: 1.5; }
 .ov .num text { font: 700 11px var(--mono); fill: var(--dot-ring); text-anchor: middle; dominant-baseline: central; }
 
@@ -369,9 +368,6 @@ ol.rank li .t { font-family: var(--mono); }
 .ov .link.good { stroke: var(--good); stroke-width: 2; }
 .ov .link.mid { stroke: var(--mid); stroke-width: 2; }
 .ov .link.bad { stroke: var(--bad); stroke-width: 2; }
-.ov .dist.good { stroke: var(--good); stroke-width: 8px; }
-.ov .dist.mid { stroke: var(--mid); stroke-width: 8px; }
-.ov .dist.bad { stroke: var(--bad); stroke-width: 8px; fill: var(--card); }
 ol.rank li[data-pid] { cursor: pointer; }
 ol.rank li[data-pid]:hover, ol.rank li[data-pid]:focus-visible { border-color: var(--foreground); background: var(--accent-neon); outline: none; }
 ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: var(--muted-foreground); }
@@ -1228,7 +1224,6 @@ function renderMarks() {
     if (g.q !== t.qid) {
       const above = gp.y < t.y;
       h += ln(t, gp, g.pts);
-      h += mk({ x: (t.x + gp.x) / 2, y: (t.y + gp.y) / 2 }, `<text class="dist ${tone(g.pts)}" dy="-7">${fmtKm(g.d)}</text>`, 'mid');
       h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss');
       h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="${above ? 23 : -14}">${esc(t.name)}</text>`, 'tgt');
     } else {
