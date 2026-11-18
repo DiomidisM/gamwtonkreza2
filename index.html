@@ -337,15 +337,7 @@ button.pip:hover { transform: translateY(-2px); box-shadow: 0 2px 0 var(--foregr
 .days .today { font-weight: 400; color: var(--muted-foreground); }
 @media (max-width: 520px) { .days .dl, .days .muted { display: none; } .days .ds { display: inline; } .days button { gap: 10px; } }
 .days li.cur button { box-shadow: inset 4px 0 0 var(--foreground); }
-/* sharing the exact answers: a tick box under the copy buttons, and the name it is shared under */
-.sharelink { margin-top: 14px; display: grid; gap: 8px; }
-.sharelink label.tick { display: flex; align-items: flex-start; gap: 8px; font-size: var(--fs-3); cursor: pointer; }
-.sharelink input[type=checkbox] { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--foreground); flex: none; }
-.sharelink .why { display: block; font-size: var(--fs-2); color: var(--muted-foreground); }
-.sharelink #nameshow b { color: var(--foreground); font-weight: 600; }
-.sharelink #nameshow .linkbtn { margin: 0; }
-.sharelink .namerow { display: flex; align-items: center; gap: 8px; font-size: var(--fs-3); color: var(--muted-foreground); padding-left: 25px; }
-#myname { flex: 1; min-width: 0; max-width: 220px; font: 500 var(--fs-3) var(--body); padding: 6px 9px; border: 2px solid var(--foreground); border-radius: 0; background: var(--card); color: var(--foreground); }
+
 .notice { margin: 12px 0 0; padding: 8px 10px; border: 1.5px solid var(--foreground); background: var(--mid); font-size: var(--fs-3); }
 @media (prefers-reduced-motion: reduce) { .ov .tgt .pulse { animation: none; opacity: 0; } }
 
@@ -449,13 +441,7 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
           <div><dt>Πιο μακριά</dt><dd id="dfar"></dd></div>
         </dl>
         <p class="best" id="dbest"></p>
-        <div class="sharelink" id="sharelink">
-          <label class="tick"><input type="checkbox" id="shareAns"><span>Μοιράσου τις ακριβείς απαντήσεις σου<span class="why">Η αντιγραφή βάζει τότε έναν σύνδεσμο που ανοίγει αυτή την οθόνη, για όποιον έχει ήδη παίξει τη μέρα.</span></span></label>
-          <div class="namerow" id="namerow" hidden><label for="myname">Το όνομά σου:</label><input id="myname" type="text" maxlength="24" autocomplete="nickname" placeholder="π.χ. Κρέζας"></div>
-          <div class="namerow" id="nameshow" hidden><span>ως <b id="nameval"></b> ·</span></div>
-        </div>
         </details>
-        <div class="actions" id="friendwrap" hidden><button type="button" class="primary" id="friend"></button></div>
         <p class="hint" id="sharemsg" style="margin-top:10px"></p>
         <textarea id="sharetext" rows="10" readonly hidden aria-label="Αποτέλεσμα για αντιγραφή"></textarea>
         <div class="nextgame" id="nextgame">
@@ -848,15 +834,7 @@ function renderAll() {
     $('#sharemsg').textContent = '';
     $('#sharetext').hidden = true;
     $('#done .sharecol').hidden = !you;
-    $('#sharelink').hidden = !you || PRACTICE;
     $('#mine').hidden = you;
-    $('#shareAns').checked = !!store.get('shareAns', false);
-    $('#myname').value = store.get('name', '');
-    renderName(false);
-    // a shared link opened before this day was played: once it is, offer the results it held
-    const f = you && pend && pend.day === S.day ? pend : null;
-    $('#friendwrap').hidden = !f;
-    if (f) $('#friend').textContent = `Δες τα αποτελέσματα: ${f.name} →`;
     tick();
   }
 
@@ -1007,34 +985,8 @@ $('#arch').addEventListener('click', e => {
   if (b) { closeDlg($('#arch')); openDay(b.dataset.day); }
 });
 if (PRACTICE) $('#archBtn').hidden = true;
-const SITE = 'https://diomidism.github.io/gamwtonkreza2/';
-// a shared link: #<day number>[a]-<the five answers' qids in base 36, dot-separated>-<name>
-// ("a": played from the archive). The places and the points come from the day itself.
-function shareLink() {
-  return SITE + '#' + dayNum(S.day) + (S.arch ? 'a' : '') + '-' + S.guesses.map(g => g.q.toString(36)).join('.') + '-' + encodeURIComponent(store.get('name', '').trim());
-}
-function parseShare(h) {
-  const m = /^#(\d{1,5})(a?)-([0-9a-z]{1,8}(?:\.[0-9a-z]{1,8}){4})-(.*)$/.exec(h);
-  if (!m) return null;
-  const n = +m[1], qs = m[3].split('.').map(x => parseInt(x, 36));
-  if (n < 1 || n > dayNum(todayKey()) || !qs.every(q => BYQ.has(q))) return null;
-  let name = '';
-  try { name = decodeURIComponent(m[4]); } catch { name = m[4]; }
-  name = name.replace(/\s+/g, ' ').trim().slice(0, 24) || 'Φίλος';
-  return { n, day: keyOfNum(n), arch: !!m[2], qs, name, hash: h };
-}
-// the results a link held, rebuilt from the day: shown read-only, never saved, never counted
-function sharedState(L) {
-  const targets = dailyTargets(L.day);
-  const guesses = L.qs.map((q, k) => {
-    const t = BYQ.get(targets[k]), exact = q === t.qid, d = exact ? 0 : km(BYQ.get(q), t);
-    return { q, d: Math.round(d * 100) / 100, pts: exact ? 1000 : points(d) };
-  });
-  return { v: SAVE_V, day: L.day, targets, guesses, round: 4, phase: 'done', arch: L.arch, shared: L.name };
-}
-// a link opened before playing its day: kept for this tab, offered once the day is finished
-let pend = (() => { try { return JSON.parse(sessionStorage.getItem('gamwtonkreza2.pend') || 'null'); } catch { return null; } })();
-const setPend = v => { pend = v; try { v ? sessionStorage.setItem('gamwtonkreza2.pend', JSON.stringify(v)) : sessionStorage.removeItem('gamwtonkreza2.pend'); } catch { /* storage unavailable */ } };
+// the address of this page, so a copied result points at wherever it is hosted (the fork's Pages site when opened from a file)
+const SITE = /^https?:/.test(location.protocol) ? location.origin + location.pathname.replace(/[^/]*$/, '') : 'https://diommav.github.io/gamwtonkreza2/';
 const setNotice = t => { $('#notice').textContent = t || ''; $('#notice').hidden = !t; };
 const plainUrl = () => location.pathname + location.search;
 // open a day and put its number in the address (today: the plain address)
@@ -1051,33 +1003,18 @@ let here = null;
 function route(animate) { routeTo(animate); here = location.hash; }
 function routeTo(animate) {
   setNotice('');
-  const L = PRACTICE ? null : parseShare(location.hash);
-  if (L) {
-    const mine = store.get('day.' + L.day, null);
-    if (validState(mine) && mine.day === L.day && mine.phase === 'done') {
-      if (pend && pend.day === L.day) setPend(null);
-      S = sharedState(L); view = null; clearInput();
-      renderAll(); focusView(animate);
-      return;
-    }
-    // not played here yet: play the day first (today's game, or the day from the archive)
-    setPend(L);
-    history.replaceState(null, '', L.day === todayKey() ? plainUrl() : '#' + L.n);
-    loadDay(L.day, animate);
-    return setNotice(`Αυτός ο σύνδεσμος έχει τα αποτελέσματα: ${L.name} για το #${L.n}. Δεν έχεις παίξει αυτή τη μέρα: παίξε πρώτα και μετά μπορείς να τα δεις.`);
-  }
-  const m = /^#(\d{1,5})(a?-.*)?$/.exec(location.hash);
+  const m = /^#(\d{1,5})(?:a?-.*)?$/.exec(location.hash);  // an old link that carried answers just opens its day
   if (PRACTICE || !m) {
     if (location.hash) history.replaceState(null, '', plainUrl());
     return loadDay(todayKey(), animate);
   }
   const n = +m[1], last = dayNum(todayKey());
-  if (n < 1 || n > last || m[2]) {
+  if (n < 1 || n > last) {
     history.replaceState(null, '', plainUrl());
-    loadDay(todayKey(), animate);
-    return setNotice(n >= 1 && n <= last ? 'Αυτός ο σύνδεσμος δεν άνοιξε: μάλλον κόπηκε στην αντιγραφή. Αυτό είναι το σημερινό παιχνίδι.' : n > last ? `Η μέρα #${n} δεν έχει έρθει ακόμα. Αυτό είναι το σημερινό παιχνίδι.` : `Δεν υπάρχει μέρα #${n}. Το πρώτο παιχνίδι ήταν το #1.`);
+    return loadDay(todayKey(), animate);
   }
   if (n === last) history.replaceState(null, '', plainUrl());
+  else if (location.hash !== '#' + n) history.replaceState(null, '', '#' + n);  // drop any old answers from the address
   loadDay(keyOfNum(n), animate);
 }
 addEventListener('popstate', () => route(true));
@@ -1139,11 +1076,6 @@ $('#back').addEventListener('click', () => { view = null; renderAll(); focusView
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && view != null && !$('#stats').open && !$('#arch').open) { view = null; renderAll(); focusView(true); } });
 
 function copyResult(done = 'Αντιγράφηκε!') {
-  if ($('#shareAns').checked && !PRACTICE && !store.get('name', '').trim()) {
-    $('#sharemsg').textContent = 'Γράψε πρώτα το όνομά σου, για να ξέρουν ποιανού είναι τα αποτελέσματα.';
-    renderName(true); $('#myname').focus();
-    return;
-  }
   const sq = { good: '🟩', mid: '🟨', bad: '🟥' };
   const sum = total();
   // one line per round: colour, distance (🎯 for the exact place), points
@@ -1156,7 +1088,7 @@ function copyResult(done = 'Αντιγράφηκε!') {
     ...rows,
     `      Μέση: ${fmtKm(avgD)}`,
     '',
-    $('#shareAns').checked && !PRACTICE ? shareLink() : SITE,
+    SITE,
   ].join('\n');
   const fallback = () => {
     const ta = $('#sharetext'); ta.hidden = false; ta.value = text; ta.focus(); ta.select();
@@ -1168,25 +1100,7 @@ function copyResult(done = 'Αντιγράφηκε!') {
   } catch { fallback(); }
 }
 $('#share').addEventListener('click', () => copyResult());
-// the name: asked for once, then shown as "ως Κρέζας · αλλαγή"
-function renderName(editing) {
-  const name = store.get('name', '').trim(), on = $('#shareAns').checked;
-  $('#namerow').hidden = !on || (!!name && !editing);
-  $('#nameshow').hidden = !on || !name || editing;
-  $('#nameval').textContent = name;
-}
-const nameDone = () => { if (store.get('name', '').trim()) renderName(false); };
-$('#myname').addEventListener('blur', nameDone);
-$('#myname').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nameDone(); $('#share').focus({ preventScroll: true }); } });
-$('#shareAns').addEventListener('change', e => {
-  store.set('shareAns', e.target.checked);
-  renderName(false);
-  $('#sharemsg').textContent = '';
-  if (e.target.checked && !store.get('name', '').trim()) $('#myname').focus();
-});
-$('#myname').addEventListener('input', e => store.set('name', e.target.value.replace(/\s+/g, ' ').trim().slice(0, 24)));
 $('#mine').addEventListener('click', () => openDay(S.day));
-$('#friend').addEventListener('click', () => { if (pend) { history.pushState(null, '', pend.hash); route(true); } });
 // the Marilena button: the same copy, only the thank-you line is different
 $('#share2').addEventListener('click', () => copyResult('Αντιγράφτηκε, Μαριλένα. Στείλ’ το στην Tradλeague.'));
 
@@ -1907,7 +1821,6 @@ function logout() {
   if (!confirm('Αποσύνδεση;\n\nΘα μπεις ως νέος παίκτης: θα σβηστούν τα στατιστικά και τα αποθηκευμένα παιχνίδια από αυτή τη συσκευή. Η παλιά σου κατάταξη μένει όπως είναι.')) return;
   try {
     Object.keys(localStorage).filter(k => k.startsWith('gamwtonkreza2')).forEach(k => localStorage.removeItem(k));
-    sessionStorage.removeItem('gamwtonkreza2.pend');
     localStorage.setItem(FPSALT_KEY, uuid4());
   } catch { /* storage unavailable */ }
   document.cookie = 'gk_pid=; max-age=0; path=/';
