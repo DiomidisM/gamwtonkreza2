@@ -119,6 +119,11 @@ a:hover { text-decoration-style: solid; }
 .grp { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .grp > li { border-bottom: 1px solid var(--border); }
 .grp > li.sep { padding: 10px 2px 4px; font: 500 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); border-bottom: 0; }
+.grp summary.prow { cursor: pointer; list-style: none; }
+.grp summary.prow::-webkit-details-marker { display: none; }
+.grp .pdays { list-style: none; margin: 0 0 8px; padding: 0 0 0 34px; }
+.grp .pdays button { box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 6px 4px; background: none; border: 0; font: 500 var(--fs-3) var(--mono); text-align: left; cursor: pointer; }
+.grp .pdays button:hover { background: var(--accent-neon); }
 .grp .prow { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 2px; }
 .grp li.me > .prow { background: var(--accent-neon); }
 .grp .hd { padding: 8px 0 0; }
@@ -1866,8 +1871,9 @@ async function renderGroup() {
   const val = p => nf.format(p.avg), key = p => p.avg;
   const ps = HIST.players.slice().sort((a, b) => key(b) - key(a) || b.games - a.games);
   const main = ps.filter(p => p.games >= 3), few = ps.filter(p => p.games < 3);
-  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><div class="prow"><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span class="w">${p.wins ? '🏆' + p.wins : '·'}</span></div></li>`;
+  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><details><summary class="prow"><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span class="w">${p.wins ? '🏆' + p.wins : '·'}</span></summary><ol class="pdays">${(p.days || []).map(d => `<li><button type="button" data-go="${p.me ? hashOfDay(dayNum(d.day)) : '#' + dayNum(d.day) + '/' + pid8(p.pid)}"><span>#${dayNum(d.day)} · ${esc(archShortFmt.format(keyDate(d.day)))}${d.late ? ' · αρχείο' : ''}</span><span>${nf.format(d.total)}</span></button></li>`).join('')}</ol></details></li>`;
   const head = '<li class="sep hd"><div class="prow"><span></span><span></span><span class="v">μέσος όρος</span><span class="w">νίκες</span></div></li>';
+  $('#grpList').onclick = e => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); };
   $('#grpList').innerHTML = (main.length || few.length ? head + main.map(row).join('') + (few.length ? `<li class="sep">λίγες μέρες (κάτω από 3)</li>` + few.map((p, i) => row(p, main.length + i)).join('') : '') : '<li class="sep">Κανείς ακόμα.</li>');
 }
 
