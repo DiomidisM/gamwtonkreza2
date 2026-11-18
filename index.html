@@ -78,7 +78,10 @@ a:hover { text-decoration-style: solid; }
 .tabs3 button[aria-current="page"] { background: var(--accent-neon); }
 .tabs3 button.dot::after { content: " •"; color: var(--bad); }
 .daybar { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.daybar .date { flex: 1; text-align: center; }
+.daybar .date { flex: 1; text-align: center; cursor: pointer; margin: 0; }
+.daybar .date::after { content: " ▾"; }
+.daypop { flex: 0 0 100%; order: 4; position: absolute; left: 0; right: 0; top: 100%; z-index: 30; max-height: min(60vh, 520px); overflow: auto; background: var(--background); border: 2px solid var(--foreground); box-shadow: 0 8px 0 rgba(0,0,0,.08); padding: 8px 10px 4px; }
+.daypop .note { margin: 0 0 6px; }
 .daybar button { width: 36px; min-height: 36px; background: var(--card); border: 2px solid var(--foreground); font: 700 var(--fs-4) var(--mono); color: var(--foreground); cursor: pointer; }
 .daybar button:disabled { opacity: .3; cursor: default; }
 .app.v-days .tag, .app.v-days .status, .app.v-days #panel, .app.v-days #dayBoard, .app.v-days .log, .app.v-days .daybar,
@@ -434,8 +437,9 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
       <div class="brand">
         <h1><span class="hname">gamwtonkreza2</span> <span class="practag" id="archtag" hidden>Αρχείο</span></h1>
         <details class="whomenu" id="whomenu" hidden><summary id="whoChip"></summary><div><button type="button" class="linkbtn" id="logoutBtn">Αποσύνδεση</button><button type="button" class="linkbtn" id="delBtn">Διαγραφή των δεδομένων μου</button></div></details>
-        <nav class="tabs3" id="tabs3" aria-label="Προβολές"><button type="button" id="tabToday">Σήμερα</button><button type="button" id="tabDays">Μέρες</button><button type="button" id="tabGroup">Παρέα</button></nav>
-        <div class="daybar" id="daybar"><button type="button" id="dayPrev" aria-label="Προηγούμενη μέρα">‹</button><p class="date" id="date"></p><button type="button" id="dayNext" aria-label="Επόμενη μέρα">›</button></div>
+        <nav class="tabs3" id="tabs3" aria-label="Προβολές"><button type="button" id="tabToday">Παιχνίδι</button><button type="button" id="tabGroup">Παρέα</button></nav>
+        <div class="daybar" id="daybar"><button type="button" id="dayPrev" aria-label="Προηγούμενη μέρα">‹</button><p class="date" id="date" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" title="Διάλεξε μέρα"></p><button type="button" id="dayNext" aria-label="Επόμενη μέρα">›</button></div>
+        <div class="daypop" id="daypop" hidden><p class="note" id="daysHead"></p><ol class="days" id="daysList"></ol></div>
       </div>
       <p class="tag">Βρες την πόλη ή το χωριό που απεικονίζεται στο χάρτη, όσο πιο κοντά γίνεται κάθε φορά.</p>
       <div class="status">
@@ -513,12 +517,6 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
       <div class="cmpbar" id="cmpbar" hidden></div>
       <ol class="rank" id="boardList"></ol>
       <p class="note" id="boardNote"></p>
-    </section>
-
-    <section class="view pad" id="viewDays" hidden>
-      <h2>Μέρες</h2>
-      <p class="note" id="daysHead" style="margin:0 0 8px"></p>
-      <ol class="days" id="daysList"></ol>
     </section>
 
     <section class="view pad" id="viewGroup" hidden>
@@ -979,11 +977,11 @@ function openDay(key) { go(hashOfDay(dayNum(key))); }
 let here = null;
 function route(animate) { routeTo(animate); here = location.hash; }
 function routeTo(animate) {
-  setNotice('');
-  if (!PRACTICE && (location.hash === '#meres' || location.hash === '#parea')) {
+  setNotice(''); if ($('#daypop')) $('#daypop').hidden = true;
+  if (!PRACTICE && (location.hash === '#parea')) {
     if (!S) loadDay(todayKey(), false);
-    setView(location.hash === '#meres' ? 'days' : 'group');
-    return location.hash === '#meres' ? renderDays() : renderGroup();
+    setView('group');
+    return renderGroup();
   }
   setView('day');
   const m = /^#(\d{1,5})(?:\/([0-9a-f]{8}))?(?:a?-.*)?$/.exec(location.hash);  // an old link that carried answers just opens its day
@@ -1803,8 +1801,8 @@ $('#playNow').addEventListener('click', () => {
 /* ---------- tabs and the day bar ---------- */
 function setView(v) {
   VIEW = v;
-  const app = $('.app'); app.classList.toggle('v-days', v === 'days'); app.classList.toggle('v-group', v === 'group');
-  $('#viewDays').hidden = v !== 'days'; $('#viewGroup').hidden = v !== 'group';
+  const app = $('.app'); app.classList.toggle('v-group', v === 'group');
+  $('#viewGroup').hidden = v !== 'group';
   renderChrome();
 }
 function renderChrome() {
@@ -1812,14 +1810,13 @@ function renderChrome() {
   $('#tabs3').hidden = off; $('#dayPrev').hidden = off; $('#dayNext').hidden = off;
   if (off || !S) return;
   const today = todayKey(), n = dayNum(S.day);
-  const cur = VIEW === 'group' ? 'Group' : VIEW === 'days' || S.day !== today ? 'Days' : 'Today';
-  for (const k of ['Today', 'Days', 'Group']) { const b = $('#tab' + k); if (k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
+  const cur = VIEW === 'group' ? 'Group' : 'Today';
+  for (const k of ['Today', 'Group']) { const b = $('#tab' + k); if (k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   const tdone = (store.get('day.' + today, {}) || {}).phase === 'done';
   $('#tabToday').classList.toggle('dot', !tdone);
   $('#dayPrev').disabled = n <= 1; $('#dayNext').disabled = n >= dayNum(today);
 }
 $('#tabToday').addEventListener('click', () => go(''));
-$('#tabDays').addEventListener('click', () => go('#meres'));
 $('#tabGroup').addEventListener('click', () => go('#parea'));
 $('#dayPrev').addEventListener('click', () => { if (S) go(hashOfDay(dayNum(S.day) - 1)); });
 $('#dayNext').addEventListener('click', () => { if (S) go(hashOfDay(dayNum(S.day) + 1)); });
@@ -1830,7 +1827,7 @@ async function renderDays() {
   const el = $('#daysList');
   if (!HIST) el.innerHTML = '<li><button type="button" disabled><span class="muted">Φόρτωση…</span><span></span><span></span></button></li>';
   await loadHist();
-  if (VIEW !== 'days') return;
+  if ($('#daypop').hidden) return;
   const last = dayNum(todayKey()); let played = 0; const rows = [];
   for (let n = last; n >= 1; n--) {
     const key = keyOfNum(n), hd = HIST && HIST.days.find(x => x.day === key), loc = store.get('day.' + key, null);
@@ -1851,7 +1848,15 @@ async function renderDays() {
   $('#daysHead').textContent = `${last} ${last === 1 ? 'μέρα' : 'μέρες'} · έπαιξες ${played} · σου λείπουν ${last - played}`;
   el.innerHTML = rows.join('');
 }
-$('#daysList').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (b) go(hashOfDay(+b.dataset.n)); });
+function dayPop(open) {
+  $('#daypop').hidden = !open; $('#date').setAttribute('aria-expanded', String(open));
+  if (open) renderDays();
+}
+$('#date').addEventListener('click', () => dayPop($('#daypop').hidden));
+$('#date').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dayPop($('#daypop').hidden); } });
+document.addEventListener('click', e => { if (!$('#daypop').hidden && !e.target.closest('#daypop, #date')) dayPop(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#daypop').hidden) { dayPop(false); e.stopPropagation(); } }, true);
+$('#daysList').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (b) { dayPop(false); go(hashOfDay(+b.dataset.n)); } });
 async function renderGroup() {
   if (!HIST) $('#grpList').innerHTML = '<li class="sep">Φόρτωση…</li>';
   await loadHist();
