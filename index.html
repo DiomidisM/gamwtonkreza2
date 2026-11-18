@@ -82,7 +82,6 @@ a:hover { text-decoration-style: solid; }
 .daybar button { width: 36px; min-height: 36px; background: var(--card); border: 2px solid var(--foreground); font: 700 var(--fs-4) var(--mono); color: var(--foreground); cursor: pointer; }
 .daybar button:disabled { opacity: .3; cursor: default; }
 .app.v-days .tag, .app.v-days .status, .app.v-days #panel, .app.v-days #dayBoard, .app.v-days .log, .app.v-days .daybar,
-.app.v-all .tag, .app.v-all .status, .app.v-all #panel, .app.v-all #dayBoard, .app.v-all .log, .app.v-all .daybar,
 .app.v-group .tag, .app.v-group .status, .app.v-group #panel, .app.v-group #dayBoard, .app.v-group .log, .app.v-group .daybar { display: none; }
 .view { padding-block: 16px 28px; border-top: 2px solid var(--foreground); flex: 1; }
 .view h2 { margin: 0 0 10px; font: 800 var(--fs-5)/1.1 var(--body); letter-spacing: -.02em; }
@@ -119,15 +118,6 @@ a:hover { text-decoration-style: solid; }
 .grp > li.sep { padding: 10px 2px 4px; font: 500 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); border-bottom: 0; }
 .grp .prow { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 2px; }
 .grp li.me > .prow { background: var(--accent-neon); }
-.all { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
-.all li { border-bottom: 1px solid var(--border); }
-.all li.me button { background: var(--accent-neon); }
-.all button { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 6px; background: none; border: 0; text-align: left; cursor: pointer; }
-.all button:hover { background: var(--accent-neon); }
-.all .dn { font: 500 var(--fs-2) var(--mono); color: var(--muted-foreground); min-width: 9.5em; }
-.all .nm small { color: var(--muted-foreground); font: 400 var(--fs-2) var(--mono); margin-left: 6px; }
-.all .pt { font: 700 var(--fs-3) var(--mono); font-variant-numeric: tabular-nums; }
-@media (max-width: 520px) { .all .dn { min-width: 0; } }
 .grp .hd { padding: 8px 0 0; }
 .grp .hd .prow { padding: 0 2px; }
 .grp .hd .v, .grp .hd .w { font: 500 var(--fs-1) var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
@@ -444,7 +434,7 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
       <div class="brand">
         <h1><span class="hname">gamwtonkreza2</span> <span class="practag" id="archtag" hidden>Αρχείο</span></h1>
         <details class="whomenu" id="whomenu" hidden><summary id="whoChip"></summary><div><button type="button" class="linkbtn" id="logoutBtn">Αποσύνδεση</button><button type="button" class="linkbtn" id="delBtn">Διαγραφή των δεδομένων μου</button></div></details>
-        <nav class="tabs3" id="tabs3" aria-label="Προβολές"><button type="button" id="tabToday">Σήμερα</button><button type="button" id="tabDays">Μέρες</button><button type="button" id="tabGroup">Παρέα</button><button type="button" id="tabAll">Όλα</button></nav>
+        <nav class="tabs3" id="tabs3" aria-label="Προβολές"><button type="button" id="tabToday">Σήμερα</button><button type="button" id="tabDays">Μέρες</button><button type="button" id="tabGroup">Παρέα</button></nav>
         <div class="daybar" id="daybar"><button type="button" id="dayPrev" aria-label="Προηγούμενη μέρα">‹</button><p class="date" id="date"></p><button type="button" id="dayNext" aria-label="Επόμενη μέρα">›</button></div>
       </div>
       <p class="tag">Βρες την πόλη ή το χωριό που απεικονίζεται στο χάρτη, όσο πιο κοντά γίνεται κάθε φορά.</p>
@@ -529,12 +519,6 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
       <h2>Μέρες</h2>
       <p class="note" id="daysHead" style="margin:0 0 8px"></p>
       <ol class="days" id="daysList"></ol>
-    </section>
-
-    <section class="view pad" id="viewAll" hidden>
-      <h2>Όλα τα παιχνίδια</h2>
-      <p class="note" id="allHead" style="margin:0 0 8px"></p>
-      <ol class="all" id="allList"></ol>
     </section>
 
     <section class="view pad" id="viewGroup" hidden>
@@ -996,11 +980,10 @@ let here = null;
 function route(animate) { routeTo(animate); here = location.hash; }
 function routeTo(animate) {
   setNotice('');
-  if (!PRACTICE && (location.hash === '#meres' || location.hash === '#parea' || location.hash === '#all')) {
+  if (!PRACTICE && (location.hash === '#meres' || location.hash === '#parea')) {
     if (!S) loadDay(todayKey(), false);
-    const hv = location.hash === '#meres' ? 'days' : location.hash === '#all' ? 'all' : 'group';
-    setView(hv);
-    return hv === 'days' ? renderDays() : hv === 'all' ? renderAll2() : renderGroup();
+    setView(location.hash === '#meres' ? 'days' : 'group');
+    return location.hash === '#meres' ? renderDays() : renderGroup();
   }
   setView('day');
   const m = /^#(\d{1,5})(?:\/([0-9a-f]{8}))?(?:a?-.*)?$/.exec(location.hash);  // an old link that carried answers just opens its day
@@ -1820,8 +1803,8 @@ $('#playNow').addEventListener('click', () => {
 /* ---------- tabs and the day bar ---------- */
 function setView(v) {
   VIEW = v;
-  const app = $('.app'); app.classList.toggle('v-days', v === 'days'); app.classList.toggle('v-group', v === 'group'); app.classList.toggle('v-all', v === 'all');
-  $('#viewDays').hidden = v !== 'days'; $('#viewGroup').hidden = v !== 'group'; $('#viewAll').hidden = v !== 'all';
+  const app = $('.app'); app.classList.toggle('v-days', v === 'days'); app.classList.toggle('v-group', v === 'group');
+  $('#viewDays').hidden = v !== 'days'; $('#viewGroup').hidden = v !== 'group';
   renderChrome();
 }
 function renderChrome() {
@@ -1829,8 +1812,8 @@ function renderChrome() {
   $('#tabs3').hidden = off; $('#dayPrev').hidden = off; $('#dayNext').hidden = off;
   if (off || !S) return;
   const today = todayKey(), n = dayNum(S.day);
-  const cur = VIEW === 'group' ? 'Group' : VIEW === 'all' ? 'All' : VIEW === 'days' || S.day !== today ? 'Days' : 'Today';
-  for (const k of ['Today', 'Days', 'Group', 'All']) { const b = $('#tab' + k); if (k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
+  const cur = VIEW === 'group' ? 'Group' : VIEW === 'days' || S.day !== today ? 'Days' : 'Today';
+  for (const k of ['Today', 'Days', 'Group']) { const b = $('#tab' + k); if (k === cur) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   const tdone = (store.get('day.' + today, {}) || {}).phase === 'done';
   $('#tabToday').classList.toggle('dot', !tdone);
   $('#dayPrev').disabled = n <= 1; $('#dayNext').disabled = n >= dayNum(today);
@@ -1874,12 +1857,7 @@ async function renderGroup() {
   await loadHist();
   if (VIEW !== 'group') return;
   if (!HIST) { $('#grpMe').innerHTML = ''; $('#grpList').innerHTML = '<li class="sep">Η κατάταξη δεν φορτώνει τώρα.</li>'; return; }
-  const last = dayNum(todayKey()), me = HIST.me;
-  const tile = (label, value, sub) => `<div><dt>${label}</dt><dd>${value}${sub ? `<span class="sub">${sub}</span>` : ''}</dd></div>`;
-  $('#grpMe').innerHTML = me
-    ? `<p class="eyebrow">Εσύ, σε όλες τις μέρες</p><dl class="tiles">${tile('Μέρες', `${me.games}<small>/${last}</small>`)}${tile('Μέσος όρος', nf.format(me.avg))}${tile('Καλύτερο', nf.format(me.best))}${tile('Σερί', me.streak, `μέγιστο: ${me.max_streak}`)}</dl>
-       <dl class="stats" style="margin-top:10px"><div><dt>Τέλειοι γύροι</dt><dd>${me.perfect}<small>συνολικά</small></dd></div><div><dt>Πράσινοι γύροι</dt><dd>${me.rounds ? Math.round(me.green / me.rounds * 100) : 0}%</dd></div>${me.closest && BYQ.has(me.closest.q) ? `<div><dt>Καλύτερη μαντεψιά</dt><dd>${fmtKm(me.closest.km)}<span class="sub">${esc(BYQ.get(me.closest.q).name)}, #${dayNum(me.closest.day)}</span></dd></div>` : ''}</dl>`
-    : '<p class="empty">Παίξε μια μέρα για να μπεις στον πίνακα της παρέας.</p>';
+    $('#grpMe').innerHTML = '';
   const val = p => nf.format(p.avg), key = p => p.avg;
   const ps = HIST.players.slice().sort((a, b) => key(b) - key(a) || b.games - a.games);
   const main = ps.filter(p => p.games >= 3), few = ps.filter(p => p.games < 3);
@@ -1887,19 +1865,6 @@ async function renderGroup() {
   const head = '<li class="sep hd"><div class="prow"><span></span><span></span><span class="v">μέσος όρος</span><span class="w">νίκες</span></div></li>';
   $('#grpList').innerHTML = (main.length || few.length ? head + main.map(row).join('') + (few.length ? `<li class="sep">λίγες μέρες (κάτω από 3)</li>` + few.map((p, i) => row(p, main.length + i)).join('') : '') : '<li class="sep">Κανείς ακόμα.</li>');
 }
-
-async function renderAll2() {
-  if (!HIST) $('#allList').innerHTML = '<li class="sep">Φόρτωση…</li>';
-  await loadHist();
-  if (VIEW !== 'all') return;
-  if (!HIST) { $('#allHead').textContent = ''; $('#allList').innerHTML = '<li class="sep">Δεν φορτώνει τώρα.</li>'; return; }
-  const rows = HIST.players.flatMap(p => (p.days || []).map(d => ({ p, d })))
-    .sort((a, b) => (a.d.day < b.d.day ? 1 : a.d.day > b.d.day ? -1 : b.d.total - a.d.total));
-  $('#allHead').textContent = `${rows.length} ${rows.length === 1 ? 'παιχνίδι' : 'παιχνίδια'} συνολικά`;
-  $('#allList').innerHTML = rows.length ? rows.map(({ p, d }) => `<li${p.me ? ' class="me"' : ''}><button type="button" data-go="${p.me ? hashOfDay(dayNum(d.day)) : '#' + dayNum(d.day) + '/' + pid8(p.pid)}"><span class="dn">#${dayNum(d.day)} · ${esc(archShortFmt.format(keyDate(d.day)))}</span><span class="nm">${esc(p.name)}${d.late ? '<small>αρχείο</small>' : ''}</span><span class="pt">${nf.format(d.total)}</span></button></li>`).join('') : '<li class="sep">Κανείς ακόμα.</li>';
-}
-$('#allList').addEventListener('click', e => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); });
-$('#tabAll').addEventListener('click', () => go('#all'));
 
 /* ---------- the name: shown in a small menu, with logout and delete ---------- */
 function renderChip() {
