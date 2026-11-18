@@ -765,6 +765,7 @@ let S = null;
 // after the game: the round whose card is shown again (0-4), or null for the results. Not saved.
 let view = null;
 // the day page: the group's board for the open day, a friend's game laid next to yours, the history
+const vg = () => (CMP && S.phase === 'done') ? CMP.rounds : S.guesses;  // whose choices are on screen: one player at a time
 let BOARD = null, CMP = null, cmpPushed = false, pendingCmp = null, HIST = null, VIEW = 'day', grpSort = 'avg';
 const NIL = '00000000-0000-4000-8000-000000000000';
 // the round whose card is on show: the one just played, or the one picked after the game
@@ -832,12 +833,12 @@ function renderAll() {
   $('#date').textContent = PRACTICE ? 'Practice · 5 τυχαία μέρη' : `#${dayNum(S.day)} · ${longFmt.format(keyDate(S.day))}`;
   const sk = shown();
   $('#pips').innerHTML = [0, 1, 2, 3, 4].map(k => {
-    const g = S.guesses[k];
+    const g = vg()[k];
     if (g && S.phase === 'done') return `<button type="button" class="pip ${tone(g.pts)}${k === view ? ' sel' : ''}" data-k="${k}" aria-pressed="${k === view}" title="Γύρος ${k + 1}: ${g.pts} βαθμοί">${g.pts}</button>`;
     if (g) return `<span class="pip ${tone(g.pts)}" title="Γύρος ${k + 1}: ${g.pts} βαθμοί">${g.pts}</span>`;
     return `<span class="pip${k === S.round && S.phase === 'play' ? ' cur' : ''}" title="Γύρος ${k + 1}"></span>`;
   }).join('');
-  $('#total').textContent = nf.format(total());
+  $('#total').textContent = nf.format(CMP && S.phase === 'done' ? CMP.total : total());
 
   $('#play').hidden = S.phase !== 'play' || !!S.preview;
   $('#unplayed').hidden = !S.preview;
@@ -889,20 +890,16 @@ function renderAll() {
   }
 
   $('#rounds').innerHTML = [0, 1, 2, 3, 4].map(k => {
-    const g = S.guesses[k];
+    const g = vg()[k];
     if (!g) {
       const now = k === S.round && S.phase === 'play';
       return `<li class="todo"><span class="n">${k + 1}</span><span>${now ? 'Τρέχων γύρος' : '·'}</span><span class="p"></span></li>`;
     }
     const tk = target(k), gp = BYQ.get(g.q);
-    const sub = g.q === tk.qid ? 'Bingo!' : `${S.shared ? 'έβαλε' : 'έβαλες'}: ${esc(gp.name)} (${esc(gp.reg)}) · ${fmtKm(g.d)}`;
+    const sub = g.q === tk.qid ? 'Bingo!' : `${S.shared || CMP ? 'έβαλε' : 'έβαλες'}: ${esc(gp.name)} (${esc(gp.reg)}) · ${fmtKm(g.d)}`;
     const pick = S.phase === 'done' ? ` class="pick${k === view ? ' sel' : ''}" data-k="${k}"` : '';
-    const c = S.phase === 'done' && CMP ? CMP.rounds[k] : null, cp = c ? BYQ.get(c.q) : null;
-    const csub = c ? `<small class="cs">${esc(CMP.name)}: ${c.q === tk.qid ? 'Bingo!' : `${esc(cp.name)} · ${fmtKm(c.d)}`}</small>` : '';
-    const ccol = c ? `<span class="p c"><span class="tone ${tone(c.pts)}"></span>${c.pts}</span>` : '';
-    return `<li${pick}><span class="n">${k + 1}</span><span><b>${esc(tk.name)}</b> <span class="reg">${esc(tk.reg)}</span><small>${sub}</small>${csub}</span><span class="p"><span class="tone ${tone(g.pts)}"></span>${g.pts}</span>${ccol}</li>`;
+    return `<li${pick}><span class="n">${k + 1}</span><span><b>${esc(tk.name)}</b> <span class="reg">${esc(tk.reg)}</span><small>${sub}</small></span><span class="p"><span class="tone ${tone(g.pts)}"></span>${g.pts}</span></li>`;
   }).join('');
-  $('#rounds').classList.toggle('cmp', S.phase === 'done' && !!CMP);
   const cb = $('#cmpbar');
   cb.hidden = true;
   chart.classList.toggle('pref-on', S.phase === 'done'); // prefecture borders and lakes only after all five rounds
@@ -1233,7 +1230,7 @@ function renderMarks() {
   if (S.phase === 'play') {
     h = mk(target(S.round), '<circle class="pulse" r="7"/><circle class="dot" r="7"/>', 'tgt');
   } else if (shown() != null) {
-    const k = shown(), t = target(k), g = S.guesses[k], gp = BYQ.get(g.q);
+    const k = shown(), t = target(k), g = vg()[k], gp = BYQ.get(g.q);
     if (g.q !== t.qid) {
       const above = gp.y < t.y;
       h += ln(t, gp, g.pts);
@@ -1243,13 +1240,13 @@ function renderMarks() {
       h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="-14">${esc(t.name)}</text>`, 'tgt');
     }
   } else {
-    if (OPT.ans) S.guesses.forEach((g, k) => {  // the player's answers, unless switched off on the map
+    if (OPT.ans) vg().forEach((g, k) => {  // the player's answers, unless switched off on the map
       const t = target(k), gp = BYQ.get(g.q);
       if (g.q !== t.qid) h += ln(t, gp, g.pts) + mk(gp, '<circle r="4"/>', 'gss sm');
     });
     S.targets.forEach((q, k) => { h += mk(BYQ.get(q), `<circle r="10"/><text>${k + 1}</text>`, 'num'); });
   }
-  ovm.innerHTML = cmpMarks() + h;
+  ovm.innerHTML = h;
   placeMarks();
   if (card) closeCard();  // a new screen: the card goes
 }
@@ -1630,10 +1627,10 @@ function boxAround(pts, min) {
 function focusView(animate) {
   if (S.phase === 'play') { fitPad = PW < 600 ? 6 : 18; fitBoxNow = target(S.round).x > GR_PLAY[2] - 20 ? GR_BOX : playBox(fitPad); }
   else if (shown() != null) {
-    const k = shown(), g = S.guesses[k];
-    fitBoxNow = boxAround([target(k), BYQ.get(g.q), ...(CMP ? [BYQ.get(CMP.rounds[k].q)] : [])], 90); fitPad = 64;
+    const k = shown(), g = vg()[k];
+    fitBoxNow = boxAround([target(k), BYQ.get(g.q)], 90); fitPad = 64;
   } else {
-    fitBoxNow = boxAround([...S.targets.map(q => BYQ.get(q)), ...S.guesses.map(g => BYQ.get(g.q)), ...(CMP ? CMP.rounds.map(r => BYQ.get(r.q)) : [])], 200); fitPad = 48;
+    fitBoxNow = boxAround([...S.targets.map(q => BYQ.get(q)), ...vg().map(g => BYQ.get(g.q))], 200); fitPad = 48;
   }
   goTo(fit(fitBoxNow, fitPad), animate);
 }
@@ -1788,13 +1785,13 @@ async function openCompare(pid, push) {
   const had = !!CMP;
   CMP = { pid, name: g.name, rounds, total: g.total };
   if (push) { history[had ? 'replaceState' : 'pushState'](null, '', `#${dayNum(S.day)}/${pid8(pid)}`); if (!had) cmpPushed = true; here = location.hash; }
-  view = null; renderAll(); focusView(true);
+  renderAll(); focusView(false);
 }
 function closeCompare() {
   if (!CMP) return;
   if (cmpPushed) { cmpPushed = false; history.back(); return; }  // the popstate reopens the plain day
   CMP = null; history.replaceState(null, '', hashOfDay(dayNum(S.day)) || plainUrl()); here = location.hash;
-  renderAll(); focusView(true);
+  renderAll(); focusView(false);
 }
 $('#cmpbar').addEventListener('click', e => { if (e.target.closest('#cmpClose')) closeCompare(); });
 $('#playNow').addEventListener('click', () => {
