@@ -904,8 +904,7 @@ function renderAll() {
   }).join('');
   $('#rounds').classList.toggle('cmp', S.phase === 'done' && !!CMP);
   const cb = $('#cmpbar');
-  cb.hidden = !(S.phase === 'done' && CMP);
-  if (!cb.hidden) cb.innerHTML = `<span>● Εσύ <b>${nf.format(total())}</b></span><span>■ ${esc(CMP.name)} <b>${nf.format(CMP.total)}</b></span><button type="button" class="linkbtn" id="cmpClose">✕ Κλείσιμο</button>`;
+  cb.hidden = true;
   chart.classList.toggle('pref-on', S.phase === 'done'); // prefecture borders and lakes only after all five rounds
   renderMarks(); renderExtras(); renderBoard(); renderChrome();
 }
@@ -1790,7 +1789,6 @@ async function openCompare(pid, push) {
   CMP = { pid, name: g.name, rounds, total: g.total };
   if (push) { history[had ? 'replaceState' : 'pushState'](null, '', `#${dayNum(S.day)}/${pid8(pid)}`); if (!had) cmpPushed = true; here = location.hash; }
   view = null; renderAll(); focusView(true);
-  $('#cmpbar').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 function closeCompare() {
   if (!CMP) return;
