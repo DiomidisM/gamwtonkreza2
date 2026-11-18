@@ -124,6 +124,12 @@ a:hover { text-decoration-style: solid; }
 .grp .pdays { list-style: none; margin: 0 0 8px; padding: 0 0 0 34px; }
 .grp .pdays button { box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; gap: 10px; padding: 6px 4px; background: none; border: 0; font: 500 var(--fs-3) var(--mono); text-align: left; cursor: pointer; }
 .grp .pdays button:hover { background: var(--accent-neon); }
+.grp .gvr { list-style: none; margin: 0 0 8px; padding: 0 0 0 34px; }
+.grp .gvr.note { padding-left: 34px; }
+.grp .gvr button { width: 100%; box-sizing: border-box; display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 4px; background: none; border: 0; text-align: left; cursor: pointer; font: 500 var(--fs-3) var(--mono); }
+.grp .gvr button:hover, .grp .gvr button.sel { background: var(--accent-neon); }
+.grp .gvr small { display: block; color: var(--muted-foreground); font: 400 var(--fs-2) var(--mono); margin: 0; }
+.grp .pdays button.on { background: var(--accent-neon); }
 .grp .prow { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 2px; }
 .grp li.me > .prow { background: var(--accent-neon); }
 .grp .hd { padding: 8px 0 0; }
@@ -769,6 +775,7 @@ let S = null;
 let view = null;
 // the day page: the group's board for the open day, a friend's game laid next to yours, the history
 const vg = () => (CMP && S.phase === 'done') ? CMP.rounds : S.guesses;  // whose choices are on screen: one player at a time
+let GV = null;  // a game opened from the «Παρέα» list: { pid, day, name, total, rounds, targets, k }
 let BOARD = null, CMP = null, cmpPushed = false, pendingCmp = null, HIST = null, VIEW = 'day', grpSort = 'avg';
 const NIL = '00000000-0000-4000-8000-000000000000';
 // the round whose card is on show: the one just played, or the one picked after the game
@@ -1228,7 +1235,25 @@ function cmpMarks() {
 }
 const mk = (p, inner, cls) => `<g class="${cls}" data-x="${p.x}" data-y="${p.y}"${p.qid ? ` data-q="${p.qid}"` : ''}>${inner}</g>`;
 const ln = (a, b, pts) => `<line class="link ${tone(pts)}" data-x1="${a.x}" data-y1="${a.y}" data-x2="${b.x}" data-y2="${b.y}"/>`;
+function gvMarks() {
+  let h = '';
+  const k = GV.k, T = i => BYQ.get(GV.targets[i]), G = i => BYQ.get(GV.rounds[i].q);
+  if (k != null) {
+    const t = T(k), gp = G(k), r = GV.rounds[k];
+    if (GV.rounds[k].q !== GV.targets[k]) {
+      const above = gp.y < t.y;
+      h += ln(t, gp, r.pts);
+      h += mk(gp, `<circle r="5.5"/><text class="lab" y="${above ? -12 : 21}">${esc(gp.name)}</text>`, 'gss');
+      h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="${above ? 23 : -14}">${esc(t.name)}</text>`, 'tgt');
+    } else h += mk(t, `<circle class="dot" r="7"/><text class="lab" y="-14">${esc(t.name)}</text>`, 'tgt');
+  } else {
+    GV.rounds.forEach((r, i) => { if (r.q !== GV.targets[i]) h += ln(T(i), G(i), r.pts) + mk(G(i), '<circle r="4"/>', 'gss sm'); });
+    GV.targets.forEach((q, i) => { h += mk(BYQ.get(q), `<circle r="10"/><text>${i + 1}</text>`, 'num'); });
+  }
+  return h;
+}
 function renderMarks() {
+  if (VIEW === 'group' && GV) { ovm.innerHTML = gvMarks(); placeMarks(); if (card) closeCard(); return; }
   let h = '';
   if (S.phase === 'play') {
     h = mk(target(S.round), '<circle class="pulse" r="7"/><circle class="dot" r="7"/>', 'tgt');
@@ -1607,9 +1632,10 @@ chart.addEventListener('pointermove', e => {
 });
 
 let anim = 0;
-function goTo(t, animate) {
+let mapReady = false;
+function goTo(t, animate, snap) {
   cancelAnimationFrame(anim); anim = 0;
-  if (!animate || reduced || !PW) { Object.assign(V, t); clampV(); draw(); return; }
+  if (snap || !mapReady || reduced || !PW) { if (PW) mapReady = true; Object.assign(V, t); clampV(); draw(); return; }
   const f = { ...V }, t0 = performance.now(), dur = 750;
   const ls0 = Math.log(f.s), ls1 = Math.log(t.s);
   const step = now => {
@@ -1628,6 +1654,12 @@ function boxAround(pts, min) {
   return [cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2];
 }
 function focusView(animate) {
+  if (VIEW === 'group' && GV) {
+    const T = i => BYQ.get(GV.targets[i]), G = i => BYQ.get(GV.rounds[i].q);
+    if (GV.k != null) { fitBoxNow = boxAround([T(GV.k), G(GV.k)], 90); fitPad = 64; }
+    else { fitBoxNow = boxAround([...GV.targets.map(q => BYQ.get(q)), ...GV.rounds.map(r => BYQ.get(r.q))], 200); fitPad = 48; }
+    return goTo(fit(fitBoxNow, fitPad), true);
+  }
   if (S.phase === 'play') { fitPad = PW < 600 ? 6 : 18; fitBoxNow = target(S.round).x > GR_PLAY[2] - 20 ? GR_BOX : playBox(fitPad); }
   else if (shown() != null) {
     const k = shown(), g = vg()[k];
@@ -1688,7 +1720,7 @@ chart.addEventListener('dblclick', e => {
 $('#zin').addEventListener('click', () => goTo({ ...V, s: V.s * 0.55 }, true));
 $('#zout').addEventListener('click', () => goTo({ ...V, s: V.s / 0.55 }, true));
 $('#zfit').addEventListener('click', () => goTo(fit(fitBoxNow, fitPad), true));
-new ResizeObserver(() => { measure(); measureUi(); goTo(fit(fitBoxNow, fitPad), false); }).observe(chart);
+new ResizeObserver(() => { measure(); measureUi(); goTo(fit(fitBoxNow, fitPad), false, true); }).observe(chart);
 
 
 /* ---------- leaderboard (Supabase) ----------
@@ -1788,13 +1820,13 @@ async function openCompare(pid, push) {
   const had = !!CMP;
   CMP = { pid, name: g.name, rounds, total: g.total };
   if (push) { history[had ? 'replaceState' : 'pushState'](null, '', `#${dayNum(S.day)}/${pid8(pid)}`); if (!had) cmpPushed = true; here = location.hash; }
-  renderAll(); focusView(false);
+  renderAll(); focusView(true);
 }
 function closeCompare() {
   if (!CMP) return;
   if (cmpPushed) { cmpPushed = false; history.back(); return; }  // the popstate reopens the plain day
   CMP = null; history.replaceState(null, '', hashOfDay(dayNum(S.day)) || plainUrl()); here = location.hash;
-  renderAll(); focusView(false);
+  renderAll(); focusView(true);
 }
 $('#cmpbar').addEventListener('click', e => { if (e.target.closest('#cmpClose')) closeCompare(); });
 $('#playNow').addEventListener('click', () => {
@@ -1805,7 +1837,7 @@ $('#playNow').addEventListener('click', () => {
 
 /* ---------- tabs and the day bar ---------- */
 function setView(v) {
-  VIEW = v;
+  VIEW = v; if (v !== 'group') GV = null;
   const app = $('.app'); app.classList.toggle('v-group', v === 'group');
   $('#viewGroup').hidden = v !== 'group';
   renderChrome();
@@ -1863,6 +1895,7 @@ document.addEventListener('click', e => { if (!$('#daypop').hidden && !e.target.
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#daypop').hidden) { dayPop(false); e.stopPropagation(); } }, true);
 $('#daysList').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (b) { dayPop(false); go(hashOfDay(+b.dataset.n)); } });
 async function renderGroup() {
+  GV = null;
   if (!HIST) $('#grpList').innerHTML = '<li class="sep">Φόρτωση…</li>';
   await loadHist();
   if (VIEW !== 'group') return;
@@ -1871,11 +1904,33 @@ async function renderGroup() {
   const val = p => nf.format(p.avg), key = p => p.avg;
   const ps = HIST.players.slice().sort((a, b) => key(b) - key(a) || b.games - a.games);
   const main = ps.filter(p => p.games >= 3), few = ps.filter(p => p.games < 3);
-  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><details><summary class="prow"><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span class="w">${p.wins ? '🏆' + p.wins : '·'}</span></summary><ol class="pdays">${(p.days || []).map(d => `<li><button type="button" data-go="${p.me ? hashOfDay(dayNum(d.day)) : '#' + dayNum(d.day) + '/' + pid8(p.pid)}"><span>#${dayNum(d.day)} · ${esc(archShortFmt.format(keyDate(d.day)))}${d.late ? ' · αρχείο' : ''}</span><span>${nf.format(d.total)}</span></button></li>`).join('')}</ol></details></li>`;
+  const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><details><summary class="prow"><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span class="w">${p.wins ? '🏆' + p.wins : '·'}</span></summary><ol class="pdays">${(p.days || []).map(d => `<li><button type="button" data-day="${d.day}" data-p="${p.pid}"><span>#${dayNum(d.day)} · ${esc(archShortFmt.format(keyDate(d.day)))}${d.late ? ' · αρχείο' : ''}</span><span>${nf.format(d.total)}</span></button></li>`).join('')}</ol></details></li>`;
   const head = '<li class="sep hd"><div class="prow"><span></span><span></span><span class="v">μέσος όρος</span><span class="w">νίκες</span></div></li>';
-  $('#grpList').onclick = e => { const b = e.target.closest('button[data-go]'); if (b) go(b.dataset.go); };
-  $('#grpList').innerHTML = (main.length || few.length ? head + main.map(row).join('') + (few.length ? `<li class="sep">λίγες μέρες (κάτω από 3)</li>` + few.map((p, i) => row(p, main.length + i)).join('') : '') : '<li class="sep">Κανείς ακόμα.</li>');
+    $('#grpList').innerHTML = (main.length || few.length ? head + main.map(row).join('') + (few.length ? `<li class="sep">λίγες μέρες (κάτω από 3)</li>` + few.map((p, i) => row(p, main.length + i)).join('') : '') : '<li class="sep">Κανείς ακόμα.</li>');
 }
+
+// a game opened from the list: shown on the map and under its line, without leaving «Παρέα»
+const gvOff = () => { document.querySelectorAll('#grpList .gvr').forEach(e => e.remove()); document.querySelectorAll('#grpList button.on').forEach(e => e.classList.remove('on')); };
+async function openGV(btn) {
+  const pid = btn.dataset.p, day = btn.dataset.day, li = btn.closest('li');
+  if (GV && GV.pid === pid && GV.day === day) { GV = null; gvOff(); renderMarks(); focusView(true); return; }
+  let g;
+  try { g = await rpc('get_game', { p_cookie: getPid(false) || NIL, p_player: pid, p_day: day }); } catch { return; }
+  gvOff();
+  if (!g.found || g.locked) { li.insertAdjacentHTML('beforeend', `<p class="gvr note">🔒 Τελείωσε πρώτα το #${dayNum(day)} για να δεις τις επιλογές.</p>`); GV = null; renderMarks(); return; }
+  const targets = dailyTargets(day), rounds = (g.rounds || []).map(r => ({ q: r.q, d: r.d, pts: r.pts }));
+  if (rounds.length !== 5 || !rounds.every(r => BYQ.has(r.q))) return;
+  GV = { pid, day, name: g.name, total: g.total, rounds, targets, k: null };
+  btn.classList.add('on');
+  btn.insertAdjacentHTML('afterend', `<ol class="gvr">${rounds.map((r, i) => { const t = BYQ.get(targets[i]), gp = BYQ.get(r.q);
+    return `<li><button type="button" data-k="${i}"><span class="n">${i + 1}</span><span><b>${esc(t.name)}</b><small>${r.q === targets[i] ? 'Bingo!' : `${esc(gp.name)} · ${fmtKm(r.d)}`}</small></span><span class="p"><span class="tone ${tone(r.pts)}"></span>${r.pts}</span></button></li>`; }).join('')}</ol>`);
+  renderMarks(); focusView(true);
+}
+$('#grpList').addEventListener('click', e => {
+  const r = e.target.closest('.gvr button[data-k]');
+  if (r && GV) { const k = +r.dataset.k; GV.k = GV.k === k ? null : k; document.querySelectorAll('#grpList .gvr button').forEach(b => b.classList.toggle('sel', +b.dataset.k === GV.k)); renderMarks(); focusView(true); return; }
+  const b = e.target.closest('button[data-day]'); if (b) openGV(b);
+});
 
 /* ---------- the name: shown in a small menu, with logout and delete ---------- */
 function renderChip() {
