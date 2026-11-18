@@ -519,7 +519,7 @@ ol.rank li .dur { margin-left: 6px; font: 500 var(--fs-1) var(--mono); color: va
     <section class="view pad" id="viewGroup" hidden>
       <h2>Παρέα</h2>
       <div id="grpMe"></div>
-      <div class="sort" id="grpSort" role="group" aria-label="Ταξινόμηση"><button type="button" data-s="avg" aria-pressed="true">Μέσος όρος</button><button type="button" data-s="wins" aria-pressed="false">Νίκες</button><button type="button" data-s="sum" aria-pressed="false">Σύνολο</button></div>
+      <div class="sort" id="grpSort" role="group" aria-label="Ταξινόμηση"><button type="button" data-s="avg" aria-pressed="true">Μέσος όρος</button><button type="button" data-s="wins" aria-pressed="false">Νίκες</button></div>
       <ol class="grp" id="grpList"></ol>
     </section>
 
@@ -1860,8 +1860,8 @@ async function renderGroup() {
        <dl class="stats" style="margin-top:10px"><div><dt>Τέλειοι γύροι</dt><dd>${me.perfect}<small>συνολικά</small></dd></div><div><dt>Πράσινοι γύροι</dt><dd>${me.rounds ? Math.round(me.green / me.rounds * 100) : 0}%</dd></div>${me.closest && BYQ.has(me.closest.q) ? `<div><dt>Καλύτερη μαντεψιά</dt><dd>${fmtKm(me.closest.km)}<span class="sub">${esc(BYQ.get(me.closest.q).name)}, #${dayNum(me.closest.day)}</span></dd></div>` : ''}</dl>`
     : '<p class="empty">Παίξε μια μέρα για να μπεις στον πίνακα της παρέας.</p>';
   for (const b of $('#grpSort').children) b.setAttribute('aria-pressed', b.dataset.s === grpSort);
-  const val = p => grpSort === 'wins' ? p.wins : grpSort === 'sum' ? nf.format(p.sum) : nf.format(p.avg);
-  const key = p => grpSort === 'wins' ? p.wins : grpSort === 'sum' ? p.sum : p.avg;
+  const val = p => grpSort === 'wins' ? p.wins : nf.format(p.avg);
+  const key = p => grpSort === 'wins' ? p.wins : p.avg;
   const ps = HIST.players.slice().sort((a, b) => key(b) - key(a) || b.games - a.games);
   const main = grpSort === 'avg' ? ps.filter(p => p.games >= 3) : ps, few = grpSort === 'avg' ? ps.filter(p => p.games < 3) : [];
   const row = (p, i) => `<li${p.me ? ' class="me"' : ''}><div class="prow"><span>${i + 1}.</span><span>${esc(p.name)}<small>${p.games} ${p.games === 1 ? 'μέρα' : 'μέρες'}</small></span><span class="v">${val(p)}</span><span>${p.wins ? '🏆' + p.wins : ''}</span></div></li>`;
